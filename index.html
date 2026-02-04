@@ -1,4 +1,3 @@
-```html
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,8 +6,8 @@
   <meta name="theme-color" content="#ff3b7a" />
   <title>Will you be my Valentine?</title>
 
-  <!-- Confetti (optional). Page still works if this fails to load. -->
-  <script defer src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <!-- Confetti (optional). Everything still works if this fails to load. -->
+  <script id="confettiLib" defer src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
   <style>
     :root{
@@ -44,6 +43,17 @@
         calc(14px + env(safe-area-inset-bottom))
         calc(14px + env(safe-area-inset-left));
       color: var(--ink);
+    }
+
+    /* Floating hearts background */
+    #bgCanvas{
+      position:fixed;
+      inset:0;
+      width:100vw;
+      height:100vh;
+      pointer-events:none;
+      z-index:0;
+      opacity:.9;
     }
 
     #confettiCanvas{
@@ -289,23 +299,6 @@
       margin-top: 3px;
       line-height: 1.25;
     }
-    .badge{
-      position:absolute;
-      top: 10px;
-      right: 10px;
-      font-size: 12px;
-      padding: 4px 8px;
-      border-radius:999px;
-      background: rgba(0,0,0,.06);
-      border: 1px solid rgba(0,0,0,.08);
-      color: rgba(0,0,0,.68);
-      user-select:none;
-    }
-    .gift.opened .badge{
-      background: rgba(18, 201, 135, .14);
-      color: rgba(4, 120, 87, 1);
-      border-color: rgba(18, 201, 135, .25);
-    }
 
     .memories{
       margin: 16px auto 0;
@@ -487,9 +480,7 @@
         rgba(255,59,122,.78),
         rgba(255,170,200,.78),
         rgba(255,210,230,.78),
-        rgba(255,59,122,.78),
-        rgba(255,170,200,.78),
-        rgba(255,210,230,.78)
+        rgba(255,59,122,.78)
       );
       transform: rotate(0deg);
       transition: transform 4s cubic-bezier(.10,.82,.12,1);
@@ -662,7 +653,7 @@
       transform: translateX(-50%) translateY(20px);
       opacity: 0;
       pointer-events:none;
-      z-index: 10001;
+      z-index:10001;
       background: rgba(255,255,255,.80);
       border: 1px solid rgba(255,255,255,.55);
       backdrop-filter: blur(10px);
@@ -687,11 +678,13 @@
     @media (prefers-reduced-motion: reduce){
       *{ transition-duration: .001ms !important; animation-duration: .001ms !important; }
       .wheel{ transition-duration: .001ms !important; }
+      #bgCanvas{ display:none; }
     }
   </style>
 </head>
 
 <body>
+  <canvas id="bgCanvas"></canvas>
   <canvas id="confettiCanvas"></canvas>
 
   <main class="card" aria-label="Valentine page">
@@ -700,7 +693,6 @@
         <div class="pill">💌 <span>Love level:</span> <b id="loveLevel">0%</b></div>
         <div class="mini-actions">
           <button class="icon-btn" id="shareBtn" title="Share / Copy link" aria-label="Share">⤴</button>
-          <button class="icon-btn" id="resetBtn" title="Reset (for testing)" aria-label="Reset">↺</button>
         </div>
       </div>
 
@@ -760,7 +752,7 @@
       <section class="screen" id="screenYes">
         <h1 id="yayTitle">YAY! Officially my Valentine 💘</h1>
         <p class="sub" id="yayText">
-          You unlocked a love letter, a date spinner, and a scratch-off coupon. (I’m extra. It’s for you.)
+          Open the surprises: a love letter, a date spinner, and a scratch-off coupon. (Yes, I’m extra. It’s for you.)
         </p>
 
         <div class="grid" aria-label="Surprises">
@@ -770,7 +762,6 @@
               <div class="title">Open Love Letter</div>
               <div class="desc">Cute. Sappy. Accurate.</div>
             </div>
-            <div class="badge">Locked</div>
           </button>
 
           <button class="gift" id="giftWheel" data-page="wheel">
@@ -779,7 +770,6 @@
               <div class="title">Spin a Date Idea</div>
               <div class="desc">We do what the wheel says.</div>
             </div>
-            <div class="badge">Locked</div>
           </button>
 
           <button class="gift" id="giftCoupon" data-page="coupon">
@@ -788,7 +778,6 @@
               <div class="title">Scratch-Off Coupon</div>
               <div class="desc">Redeemable for kisses.</div>
             </div>
-            <div class="badge">Locked</div>
           </button>
         </div>
 
@@ -798,13 +787,13 @@
         </div>
 
         <div class="hint" style="margin-top:14px;">
-          P.S. This page remembers what you unlocked — even if you refresh 🫶
+          P.S. If you refresh, it remembers your progress 🫶
         </div>
       </section>
     </div>
   </main>
 
-  <!-- Single modal overlay (robust + simple) -->
+  <!-- Single modal overlay -->
   <div class="overlay" id="overlay" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
       <div class="modal-head">
@@ -841,7 +830,6 @@
               <div class="row">
                 <button class="btn primary" id="spinBtn">Spin</button>
                 <button class="btn ghost" id="copyIdeaBtn" disabled>Copy idea</button>
-                <button class="btn ghost" id="icsBtn" disabled>Download .ics</button>
               </div>
               <ul class="ideas" id="ideaList"></ul>
             </div>
@@ -865,7 +853,7 @@
           </div>
 
           <div class="row">
-            <button class="btn ghost" id="revealBtn">Reveal (if scratching is buggy)</button>
+            <button class="btn ghost" id="revealBtn">Reveal (if scratching is weird)</button>
             <button class="btn ghost" id="resetScratchBtn">Reset scratch</button>
             <button class="btn primary" id="claimBtn" disabled>Claim reward</button>
           </div>
@@ -881,7 +869,7 @@
       "use strict";
 
       /**********************************************************************
-       *  ✅ ROBUST SETTINGS (edit these)
+       *  ✅ SETTINGS (edit these)
        **********************************************************************/
       var SETTINGS = {
         herName: "Kalani",
@@ -909,13 +897,15 @@
           { emoji: "💫", title: "My favorite person", note: "You, always." }
         ],
 
-        letter: [
+        // Love letter (requested edits + tighter spacing; no blank “extra space” lines)
+        letterLines: [
           "Hi {HER} 💖",
-          "I made this page because I wanted something that feels like *us*: playful, a little dramatic, and way too cute for no reason (except you’re worth it).",
+          "I can't wait for Valentine’s Day this year.",
+          "You asked me to show more effort… so here it is.",
+          "I made this little Valentine page just for you.",
           "Thank you for being my person — the one I want to tell everything to, celebrate everything with, and choose on the good days and the messy ones.",
           "Even when life is busy or distance is annoying, you’re still my favorite thought, my favorite notification, and my favorite future.",
           "Happy Valentine’s Day, baby. I’m really grateful it’s you.",
-          "",
           "Love,",
           "{ME}"
         ],
@@ -932,9 +922,6 @@
           "Paint night at home + keep the canvases",
           "Write each other mini letters + swap"
         ],
-
-        // Calendar invite defaults (local time)
-        ics: { year: 2026, month: 2, day: 14, hour: 19, minute: 0, durationHours: 3, location: "Somewhere cute 🥰" },
 
         coupon: {
           title: "Redeem for: one (1) perfect date",
@@ -957,11 +944,10 @@
       /**********************************************************************
        *  State (safe localStorage)
        **********************************************************************/
-      var STATE_KEY = "valentine_state_v3";
+      var STATE_KEY = "valentine_state_v4";
       var state = {
         accepted: false,
         noCount: 0,
-        opened: { letter:false, wheel:false, coupon:false },
         chosenIdea: "",
         couponRevealed: false
       };
@@ -974,17 +960,10 @@
           if(parsed && typeof parsed === "object"){
             state.accepted = !!parsed.accepted;
             state.noCount = typeof parsed.noCount === "number" ? parsed.noCount : 0;
-            state.opened = parsed.opened && typeof parsed.opened === "object" ? {
-              letter: !!parsed.opened.letter,
-              wheel: !!parsed.opened.wheel,
-              coupon: !!parsed.opened.coupon
-            } : { letter:false, wheel:false, coupon:false };
             state.chosenIdea = typeof parsed.chosenIdea === "string" ? parsed.chosenIdea : "";
             state.couponRevealed = !!parsed.couponRevealed;
           }
-        }catch(e){
-          // storage might be blocked; ignore safely
-        }
+        }catch(e){}
       }
 
       var saveTimer = null;
@@ -1000,6 +979,7 @@
       /**********************************************************************
        *  Elements
        **********************************************************************/
+      var bgCanvas = $("bgCanvas");
       var confettiCanvas = $("confettiCanvas");
 
       var screenAsk = $("screenAsk");
@@ -1040,7 +1020,6 @@
       var wheelResult = $("wheelResult");
       var ideaList = $("ideaList");
       var copyIdeaBtn = $("copyIdeaBtn");
-      var icsBtn = $("icsBtn");
 
       var couponTitle = $("couponTitle");
       var couponDesc = $("couponDesc");
@@ -1056,7 +1035,6 @@
       var giftCoupon = $("giftCoupon");
 
       var shareBtn = $("shareBtn");
-      var resetBtn = $("resetBtn");
 
       var toast = $("toast");
       var toastTimer = null;
@@ -1073,66 +1051,14 @@
       scratchSubmsg.textContent = SETTINGS.coupon.revealSmall;
 
       function buildLetterText(){
-        // No replaceAll (older Safari safety)
-        var lines = SETTINGS.letter.slice();
+        var lines = SETTINGS.letterLines.slice();
         for(var i=0;i<lines.length;i++){
           lines[i] = lines[i].split("{HER}").join(SETTINGS.herName);
           lines[i] = lines[i].split("{ME}").join(SETTINGS.yourName);
         }
-        return lines.join("\n\n");
+        // single newlines to avoid the “extra space” feeling
+        return lines.join("\n");
       }
-
-      /**********************************************************************
-       *  Confetti (safe init + safe calls)
-       **********************************************************************/
-      var confettiInstance = null;
-
-      function resizeConfettiCanvas(){
-        var dpr = Math.max(1, window.devicePixelRatio || 1);
-        confettiCanvas.width = Math.floor(window.innerWidth * dpr);
-        confettiCanvas.height = Math.floor(window.innerHeight * dpr);
-      }
-
-      function initConfettiSafe(){
-        resizeConfettiCanvas();
-        try{
-          if(window.confetti && typeof window.confetti.create === "function"){
-            confettiInstance = window.confetti.create(confettiCanvas, { resize: false, useWorker: true });
-          }
-        }catch(e){
-          confettiInstance = null;
-        }
-      }
-
-      function burstConfetti(){
-        if(!confettiInstance) return;
-        confettiInstance({
-          particleCount: 180,
-          spread: 110,
-          startVelocity: 34,
-          origin: { x: 0.5, y: 0.45 }
-        });
-      }
-
-      function miniConfetti(){
-        if(!confettiInstance) return;
-        confettiInstance({
-          particleCount: 80,
-          spread: 120,
-          startVelocity: 28,
-          origin: { x: 0.5, y: 0.35 }
-        });
-      }
-
-      window.addEventListener("resize", function(){
-        resizeConfettiCanvas();
-        // also keep buttons sane on resize if still on ask screen
-        if(screenAsk.classList.contains("active")) placeButtons();
-        if(overlay.classList.contains("open") && currentModalPage === "coupon") setupScratchCanvas();
-      });
-
-      // Confetti script is deferred; init after a short tick to allow it to load.
-      setTimeout(initConfettiSafe, 0);
 
       /**********************************************************************
        *  Toast
@@ -1145,22 +1071,192 @@
       }
 
       /**********************************************************************
-       *  Ask screen: button layout + “No” chaos (throttled)
+       *  Background hearts (robust + lightweight)
+       **********************************************************************/
+      var bgCtx = bgCanvas.getContext("2d");
+      var bgHearts = [];
+      var bgDpr = 1;
+      var bgLastT = 0;
+      var bgRaf = null;
+
+      function resizeBg(){
+        bgDpr = Math.max(1, window.devicePixelRatio || 1);
+        bgCanvas.width = Math.floor(window.innerWidth * bgDpr);
+        bgCanvas.height = Math.floor(window.innerHeight * bgDpr);
+        bgCanvas.style.width = window.innerWidth + "px";
+        bgCanvas.style.height = window.innerHeight + "px";
+      }
+
+      function rand(min, max){ return Math.random() * (max - min) + min; }
+      function spawnBgHeart(){
+        var emojis = ["❤","💗","💖","💕"];
+        var size = rand(14, 28) * bgDpr;
+        return {
+          x: rand(0, bgCanvas.width),
+          y: bgCanvas.height + rand(0, bgCanvas.height * 0.25),
+          vx: rand(-0.22, 0.22) * bgDpr,
+          vy: rand(0.25, 0.80) * bgDpr,
+          rot: rand(-0.6, 0.6),
+          vr: rand(-0.006, 0.006),
+          alpha: rand(0.16, 0.40),
+          size: size,
+          char: emojis[Math.floor(Math.random() * emojis.length)]
+        };
+      }
+
+      function initBgHearts(){
+        bgHearts = [];
+        // scale count by screen size but keep it reasonable
+        var count = clamp(Math.floor(window.innerWidth / 26), 18, 46);
+        for(var i=0;i<count;i++){
+          var h = spawnBgHeart();
+          h.y = rand(0, bgCanvas.height);
+          bgHearts.push(h);
+        }
+      }
+
+      function drawBg(t){
+        if(prefersReducedMotion()) return;
+        if(!bgLastT) bgLastT = t;
+
+        var dt = Math.min(0.04, (t - bgLastT) / 1000);
+        bgLastT = t;
+
+        bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+
+        for(var i=0;i<bgHearts.length;i++){
+          var h = bgHearts[i];
+          h.x += (h.vx * 60) * dt;
+          h.y -= (h.vy * 60) * dt;
+          h.rot += (h.vr * 60) * dt;
+
+          // wrap
+          if(h.y < -80){
+            var nh = spawnBgHeart();
+            nh.x = rand(0, bgCanvas.width);
+            bgHearts[i] = nh;
+            h = nh;
+          }
+          if(h.x < -80) h.x = bgCanvas.width + 80;
+          if(h.x > bgCanvas.width + 80) h.x = -80;
+
+          bgCtx.save();
+          bgCtx.globalAlpha = h.alpha;
+          bgCtx.translate(h.x, h.y);
+          bgCtx.rotate(h.rot);
+          bgCtx.font = (h.size) + "px system-ui, sans-serif";
+          bgCtx.textAlign = "center";
+          bgCtx.textBaseline = "middle";
+          bgCtx.fillText(h.char, 0, 0);
+          bgCtx.restore();
+        }
+
+        bgRaf = requestAnimationFrame(drawBg);
+      }
+
+      function startBg(){
+        resizeBg();
+        initBgHearts();
+        if(!prefersReducedMotion()){
+          if(bgRaf) cancelAnimationFrame(bgRaf);
+          bgLastT = 0;
+          bgRaf = requestAnimationFrame(drawBg);
+        }
+      }
+
+      /**********************************************************************
+       *  Confetti (fixed + reliable)
+       **********************************************************************/
+      var confettiInstance = null;
+
+      function resizeConfettiCanvas(){
+        var dpr = Math.max(1, window.devicePixelRatio || 1);
+        confettiCanvas.width = Math.floor(window.innerWidth * dpr);
+        confettiCanvas.height = Math.floor(window.innerHeight * dpr);
+      }
+
+      function ensureConfetti(){
+        if(confettiInstance) return true;
+        try{
+          if(window.confetti && typeof window.confetti.create === "function"){
+            resizeConfettiCanvas();
+            confettiInstance = window.confetti.create(confettiCanvas, { resize: false, useWorker: true });
+            return true;
+          }
+        }catch(e){}
+        return false;
+      }
+
+      function miniConfetti(){
+        if(!ensureConfetti()) return;
+        confettiInstance({
+          particleCount: 90,
+          spread: 120,
+          startVelocity: 28,
+          origin: { x: 0.5, y: 0.35 }
+        });
+      }
+
+      function burstConfetti(){
+        if(!ensureConfetti()) return;
+        confettiInstance({
+          particleCount: 200,
+          spread: 120,
+          startVelocity: 36,
+          origin: { x: 0.5, y: 0.45 }
+        });
+      }
+
+      function fullScreenConfetti(){
+        if(!ensureConfetti()) return;
+
+        var end = Date.now() + 1300;
+
+        (function frame(){
+          confettiInstance({
+            particleCount: 10,
+            spread: 90,
+            startVelocity: 28,
+            origin: { x: Math.random(), y: Math.random() * 0.30 }
+          });
+          if(Date.now() < end) requestAnimationFrame(frame);
+        })();
+
+        setTimeout(function(){
+          confettiInstance({
+            particleCount: 260,
+            spread: 130,
+            startVelocity: 40,
+            origin: { x: 0.5, y: 0.45 }
+          });
+        }, 240);
+      }
+
+      // If the confetti library loads after our code, initialize when it’s ready
+      var confettiLib = $("confettiLib");
+      if(confettiLib && confettiLib.addEventListener){
+        confettiLib.addEventListener("load", function(){
+          ensureConfetti();
+        });
+      }
+
+      /**********************************************************************
+       *  Ask screen: button layout + slower “No” behavior
        **********************************************************************/
       var yesScale = 1;
-      var lastNoMoveAt = 0;          // throttle movement + counters
-      var NO_COOLDOWN_MS = 260;      // prevents “noCount” exploding on pointermove
-      var NO_TRIGGER_DIST = 120;     // distance threshold
+
+      // ✅ slower change (requested)
+      var lastNoChangeAt = 0;
+      var NO_COOLDOWN_MS = 850;   // was fast; now slower
+      var NO_TRIGGER_DIST = 120;
 
       function placeButtons(){
-        // Put both buttons with explicit pixel coordinates (more robust than transforms)
         var zW = zone.clientWidth;
         var zH = zone.clientHeight;
 
         var yTop = Math.round((zH - yesBtn.offsetHeight) / 2);
         var nTop = Math.round((zH - noBtn.offsetHeight) / 2);
 
-        // centers at ~22% and ~78%
         var yesLeft = Math.round(zW * 0.22 - yesBtn.offsetWidth / 2);
         var noLeft  = Math.round(zW * 0.78 - noBtn.offsetWidth / 2);
 
@@ -1186,7 +1282,6 @@
       }
 
       function updateLoveMeter(){
-        // 0..100% in ~12 attempts
         var pct = clamp(Math.round((state.noCount / 12) * 100), 0, 100);
         loveLevel.textContent = pct + "%";
         meterFill.style.width = pct + "%";
@@ -1221,7 +1316,6 @@
 
         var mag = Math.sqrt(dx*dx + dy*dy);
         if(!mag || mag < 0.001){
-          // random direction if pointer is exactly centered
           dx = (Math.random() - 0.5);
           dy = (Math.random() - 0.5);
           mag = Math.sqrt(dx*dx + dy*dy) || 1;
@@ -1240,32 +1334,6 @@
         noBtn.style.top  = newTop  + "px";
       }
 
-      function maybeTriggerNo(clientX, clientY){
-        var now = Date.now();
-        if(now - lastNoMoveAt < NO_COOLDOWN_MS) {
-          // still move away a bit for responsiveness, but don’t spam counters/messages/confetti
-          moveNoAwayFrom(clientX, clientY);
-          return;
-        }
-        lastNoMoveAt = now;
-
-        state.noCount += 1;
-        saveStateSoon();
-
-        setNoLabel();
-        updateLoveMeter();
-        showReason();
-        growYes();
-        moveNoAwayFrom(clientX, clientY);
-
-        // tiny confetti only occasionally (keeps performance stable)
-        if(state.noCount % 2 === 0) miniConfetti();
-
-        if(state.noCount === 3) showToast("Nice try 😈");
-        if(state.noCount === 7) showToast("The universe says “YES”");
-        if(state.noCount === 10) showToast("Okay… press Yes already 🥹");
-      }
-
       function pointerDistToNo(clientX, clientY){
         var zr = zone.getBoundingClientRect();
         var px = clientX - zr.left;
@@ -1282,14 +1350,41 @@
         return Math.sqrt(dx*dx + dy*dy);
       }
 
+      function handleNoAttempt(clientX, clientY){
+        // always dodge
+        moveNoAwayFrom(clientX, clientY);
+
+        var now = Date.now();
+        if(now - lastNoChangeAt < NO_COOLDOWN_MS){
+          // ✅ slower text changes: no counter/reason/label update here
+          return;
+        }
+        lastNoChangeAt = now;
+
+        state.noCount += 1;
+        saveStateSoon();
+
+        setNoLabel();
+        updateLoveMeter();
+        showReason();
+        growYes();
+
+        // lighter confetti so it doesn't feel spammy
+        if(state.noCount % 2 === 0) miniConfetti();
+
+        if(state.noCount === 3) showToast("Nice try 😈");
+        if(state.noCount === 7) showToast("The universe says “YES”");
+        if(state.noCount === 10) showToast("Okay… press Yes already 🥹");
+      }
+
       zone.addEventListener("pointermove", function(e){
         var d = pointerDistToNo(e.clientX, e.clientY);
-        if(d < NO_TRIGGER_DIST) maybeTriggerNo(e.clientX, e.clientY);
+        if(d < NO_TRIGGER_DIST) handleNoAttempt(e.clientX, e.clientY);
       }, { passive:true });
 
       noBtn.addEventListener("pointerdown", function(e){
         e.preventDefault();
-        maybeTriggerNo(e.clientX, e.clientY);
+        handleNoAttempt(e.clientX, e.clientY);
       });
 
       noBtn.addEventListener("click", function(e){
@@ -1303,20 +1398,8 @@
       });
 
       /**********************************************************************
-       *  Yes screen + gifts
+       *  Yes screen + memory lane
        **********************************************************************/
-      function setGiftBadge(btn, opened){
-        btn.classList.toggle("opened", opened);
-        var badge = btn.querySelector(".badge");
-        badge.textContent = opened ? "Opened ✓" : "Locked";
-      }
-
-      function updateGiftBadges(){
-        setGiftBadge(giftLetter, state.opened.letter);
-        setGiftBadge(giftWheel,  state.opened.wheel);
-        setGiftBadge(giftCoupon, state.opened.coupon);
-      }
-
       function buildMemories(){
         polaroids.innerHTML = "";
         for(var i=0;i<SETTINGS.memories.length;i++){
@@ -1334,7 +1417,6 @@
       function showAskScreen(){
         screenYes.classList.remove("active");
         screenAsk.classList.add("active");
-        // ensure layout is correct when returning
         placeButtons();
       }
 
@@ -1344,7 +1426,9 @@
         hint.style.display = "none";
         reasonBox.classList.remove("show");
 
-        burstConfetti();
+        // ✅ confetti back (big moment)
+        resizeConfettiCanvas();
+        fullScreenConfetti();
         showToast("She said YES 💘");
       }
 
@@ -1356,7 +1440,6 @@
 
       function setActivePage(name){
         currentModalPage = name;
-
         pageLetter.classList.toggle("active", name === "letter");
         pageWheel.classList.toggle("active",  name === "wheel");
         pageCoupon.classList.toggle("active", name === "coupon");
@@ -1371,7 +1454,7 @@
 
         if(pageName === "letter"){
           modalTitle.textContent = "💌 A love letter for you";
-          modalSub.textContent   = "This one’s permanent. Like my choice of you.";
+          modalSub.textContent   = "You asked for effort… so I made you a whole page ❤️";
           setActivePage("letter");
           startLetterTyping();
         }
@@ -1380,6 +1463,7 @@
           modalTitle.textContent = "🎡 Spin the date idea wheel";
           modalSub.textContent   = "One spin = one plan.";
           setActivePage("wheel");
+          renderWheel();      // ✅ fixes wheel segments + alignment
           buildIdeaList();
           syncWheelResultFromState();
         }
@@ -1388,11 +1472,14 @@
           modalTitle.textContent = "🎟️ Scratch-off coupon";
           modalSub.textContent   = "Scratch to reveal your reward (or tap Reveal).";
           setActivePage("coupon");
-          setupScratchCanvas();
-          applyCouponRevealedState(state.couponRevealed);
+
+          // ✅ ensure layout is ready before measuring canvas
+          requestAnimationFrame(function(){
+            setupScratchCanvas();
+            applyCouponRevealedState(state.couponRevealed);
+          });
         }
 
-        // focus close for accessibility
         closeModalBtn.focus();
       }
 
@@ -1418,13 +1505,7 @@
         }
       });
 
-      // Gift clicks
       function openGift(page){
-        if(page === "letter") state.opened.letter = true;
-        if(page === "wheel")  state.opened.wheel  = true;
-        if(page === "coupon") state.opened.coupon = true;
-        saveStateSoon();
-        updateGiftBadges();
         openModal(page);
         miniConfetti();
       }
@@ -1434,7 +1515,7 @@
       giftCoupon.addEventListener("click", function(){ openGift("coupon"); });
 
       /**********************************************************************
-       *  Letter (typewriter, but safe + cancellable)
+       *  Letter (typewriter, cancellable)
        **********************************************************************/
       var letterRAF = null;
 
@@ -1456,7 +1537,6 @@
         var i = 0;
 
         function tick(){
-          // 3 chars per frame (fast + smooth)
           i = Math.min(full.length, i + 3);
           letterBox.textContent = full.slice(0, i);
           if(i < full.length){
@@ -1470,7 +1550,6 @@
 
       copyLetterBtn.addEventListener("click", function(){
         var text = buildLetterText();
-        // clipboard may fail on file:// or non-https; fallback to prompt
         if(navigator.clipboard && navigator.clipboard.writeText){
           navigator.clipboard.writeText(text).then(function(){
             showToast("Copied 💖");
@@ -1483,16 +1562,53 @@
       });
 
       moreConfettiBtn.addEventListener("click", function(){
-        burstConfetti();
-        showToast("More confetti ✨");
+        // ✅ fixed: always try to initialize if possible
+        resizeConfettiCanvas();
+        if(!ensureConfetti()){
+          showToast("Confetti blocked 😭 (still love you)");
+          return;
+        }
+        fullScreenConfetti();
+        showToast("MORE CONFETTI ✨");
       });
 
       /**********************************************************************
-       *  Wheel (robust spin: uses timeout, not transitionend)
+       *  Wheel (fixed: segment-aligned + deterministic landing)
        **********************************************************************/
       var wheelAngle = 0;
       var wheelSpinning = false;
       var spinTimer = null;
+
+      function renderWheel(){
+        var n = SETTINGS.dateIdeas.length;
+        if(!n) return;
+
+        var slice = 360 / n;
+        var from = -(slice / 2); // centers slice 0 at top
+
+        var colors = [
+          "rgba(255,59,122,.80)",
+          "rgba(255,170,200,.80)",
+          "rgba(255,210,230,.82)",
+          "rgba(255,130,180,.80)"
+        ];
+
+        var stops = [];
+        for(var i=0;i<n;i++){
+          var start = i * slice;
+          var end = (i + 1) * slice;
+          var c = colors[i % colors.length];
+          stops.push(c + " " + start + "deg " + end + "deg");
+        }
+
+        wheel.style.background = "conic-gradient(from " + from + "deg, " + stops.join(",") + ")";
+      }
+
+      function normalizeDeg(deg){
+        deg = deg % 360;
+        if(deg < 0) deg += 360;
+        return deg;
+      }
 
       function buildIdeaList(){
         ideaList.innerHTML = "";
@@ -1517,7 +1633,6 @@
           "✅ The wheel chose: <b>" + idea + "</b><br>" +
           '<span style="color:rgba(0,0,0,.62); font-size:13px;">You + me. No excuses. Just vibes.</span>';
         copyIdeaBtn.disabled = false;
-        icsBtn.disabled = false;
         highlightIdea(idea);
       }
 
@@ -1527,28 +1642,36 @@
         }else{
           wheelResult.innerHTML = "<b>Tip:</b> Hit <b>Spin</b> and I’ll pick something adorable for us 💞";
           copyIdeaBtn.disabled = true;
-          icsBtn.disabled = true;
         }
       }
 
       function spinWheel(){
         if(wheelSpinning) return;
+        var n = SETTINGS.dateIdeas.length;
+        if(!n) return;
+
         wheelSpinning = true;
         copyIdeaBtn.disabled = true;
-        icsBtn.disabled = true;
 
-        var n = SETTINGS.dateIdeas.length;
+        var slice = 360 / n;
+
+        // choose target slice
         var idx = Math.floor(Math.random() * n);
         var idea = SETTINGS.dateIdeas[idx];
 
-        // rotate a bunch + land roughly on a segment (visual only)
-        var extraSpins = 5 + Math.floor(Math.random() * 2);
-        wheelAngle += extraSpins * 360 + (Math.random() * 360);
+        // target rotation that brings idx to top (because slice0 center is at 0)
+        var target = normalizeDeg(360 - (idx * slice));
+
+        // compute delta from current angle to target without going backwards
+        var current = normalizeDeg(wheelAngle);
+        var delta = normalizeDeg(target - current);
+
+        var extraSpins = 5 + Math.floor(Math.random() * 2); // 5-6 spins
+        wheelAngle = wheelAngle + extraSpins * 360 + delta;
 
         wheel.style.transform = "rotate(" + wheelAngle + "deg)";
 
-        // duration matches CSS (or near 0 for reduced motion)
-        var duration = prefersReducedMotion() ? 1 : 4100;
+        var duration = prefersReducedMotion() ? 1 : 4050;
         if(spinTimer) clearTimeout(spinTimer);
         spinTimer = setTimeout(function(){
           wheelSpinning = false;
@@ -1576,104 +1699,54 @@
         }
       });
 
-      function pad2(n){ return (n < 10 ? "0" : "") + n; }
-      function formatICSDateUTC(d){
-        return (
-          d.getUTCFullYear() +
-          pad2(d.getUTCMonth()+1) +
-          pad2(d.getUTCDate()) + "T" +
-          pad2(d.getUTCHours()) +
-          pad2(d.getUTCMinutes()) +
-          pad2(d.getUTCSeconds()) + "Z"
-        );
-      }
-
-      function downloadICS(summary, description, location, startLocal, endLocal){
-        var uid = Date.now() + "-" + Math.random().toString(16).slice(2) + "@valentine";
-        var dtstamp = formatICSDateUTC(new Date());
-
-        var ics =
-"BEGIN:VCALENDAR\n" +
-"VERSION:2.0\n" +
-"PRODID:-//Valentine//EN\n" +
-"CALSCALE:GREGORIAN\n" +
-"METHOD:PUBLISH\n" +
-"BEGIN:VEVENT\n" +
-"UID:" + uid + "\n" +
-"DTSTAMP:" + dtstamp + "\n" +
-"DTSTART:" + formatICSDateUTC(startLocal) + "\n" +
-"DTEND:" + formatICSDateUTC(endLocal) + "\n" +
-"SUMMARY:" + summary.replace(/\n/g," ") + "\n" +
-"DESCRIPTION:" + description.replace(/\n/g,"\\n") + "\n" +
-"LOCATION:" + location.replace(/\n/g," ") + "\n" +
-"END:VEVENT\n" +
-"END:VCALENDAR\n";
-
-        var blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
-        var url = URL.createObjectURL(blob);
-        var a = document.createElement("a");
-        a.href = url;
-        a.download = "valentine-date.ics";
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        setTimeout(function(){ URL.revokeObjectURL(url); }, 800);
-      }
-
-      icsBtn.addEventListener("click", function(){
-        var idea = state.chosenIdea || "Our Valentine Date 💖";
-        var i = SETTINGS.ics;
-        var start = new Date(i.year, i.month - 1, i.day, i.hour, i.minute, 0);
-        var end = new Date(start.getTime() + i.durationHours * 60 * 60 * 1000);
-
-        var summary = "Valentine Date: " + idea;
-        var desc = "Chosen by the wheel 🎡\n\nBring hugs. Bring kisses. Bring you.\n\nLove,\n" + SETTINGS.yourName;
-
-        downloadICS(summary, desc, i.location, start, end);
-        showToast("Calendar invite downloaded 📅");
-      });
-
       /**********************************************************************
-       *  Coupon scratch (robust + reveal fallback)
+       *  Coupon scratch (fixed: opaque cover + no peeking)
        **********************************************************************/
       var scratchCtx = scratchCanvas.getContext("2d");
       var scratching = false;
 
       function setupScratchCanvas(){
-        // Always size to the visible element size (with DPR), then redraw cover.
         var rect = scratchCanvas.getBoundingClientRect();
+        if(!rect.width || !rect.height) return;
+
         var dpr = Math.max(1, window.devicePixelRatio || 1);
 
         scratchCanvas.width  = Math.floor(rect.width * dpr);
         scratchCanvas.height = Math.floor(rect.height * dpr);
 
-        // map drawing to CSS pixels
+        // draw in CSS pixels
         scratchCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
         drawScratchCover();
       }
 
       function drawScratchCover(){
+        var rect = scratchCanvas.getBoundingClientRect();
+        if(!rect.width || !rect.height) return;
+
+        // Clear in CSS-pixel units (because we scaled via setTransform)
         scratchCtx.globalCompositeOperation = "source-over";
-        scratchCtx.clearRect(0, 0, scratchCanvas.width, scratchCanvas.height);
+        scratchCtx.clearRect(0, 0, rect.width, rect.height);
 
         if(state.couponRevealed){
-          // already revealed: leave it clear
+          // leave it fully clear
           return;
         }
 
-        var rect = scratchCanvas.getBoundingClientRect();
         var w = rect.width, h = rect.height;
 
+        // ✅ fully opaque cover so you can't see what's behind
         var g = scratchCtx.createLinearGradient(0,0,w,h);
-        g.addColorStop(0, "rgba(120,120,140,.90)");
-        g.addColorStop(.5,"rgba(190,190,205,.88)");
-        g.addColorStop(1, "rgba(110,110,130,.90)");
-        scratchCtx.fillStyle = g;
-        scratchCtx.fillRect(0,0,w,h);
+        g.addColorStop(0, "#7f7f92");
+        g.addColorStop(0.5, "#bdbdd0");
+        g.addColorStop(1, "#6f6f83");
 
-        scratchCtx.globalAlpha = 0.22;
-        scratchCtx.fillStyle = "rgba(255,255,255,.95)";
+        scratchCtx.fillStyle = g;
+        scratchCtx.fillRect(0, 0, w, h);
+
+        // subtle sparkle pattern ON TOP of cover (still opaque overall)
+        scratchCtx.globalAlpha = 0.18;
+        scratchCtx.fillStyle = "rgba(255,255,255,1)";
         scratchCtx.font = "900 16px system-ui";
         scratchCtx.textAlign = "center";
         scratchCtx.textBaseline = "middle";
@@ -1696,7 +1769,7 @@
       }
 
       function estimateRevealed(){
-        // Sample a grid to estimate how much is cleared.
+        // sample pixels in device pixel space
         var w = scratchCanvas.width;
         var h = scratchCanvas.height;
         if(w === 0 || h === 0) return 0;
@@ -1719,10 +1792,12 @@
         state.couponRevealed = !!revealed;
         claimBtn.disabled = !state.couponRevealed;
         saveStateSoon();
+
         if(state.couponRevealed){
-          // clear cover completely
+          // clear cover fully (in CSS px coordinates)
+          var rect = scratchCanvas.getBoundingClientRect();
           scratchCtx.globalCompositeOperation = "source-over";
-          scratchCtx.clearRect(0,0,scratchCanvas.width, scratchCanvas.height);
+          scratchCtx.clearRect(0,0,rect.width,rect.height);
         }else{
           drawScratchCover();
         }
@@ -1771,12 +1846,12 @@
 
       claimBtn.addEventListener("click", function(){
         if(!state.couponRevealed) return;
-        burstConfetti();
+        fullScreenConfetti();
         showToast("Claimed 💋 (redeem immediately)");
       });
 
       /**********************************************************************
-       *  Share + Reset (Reset is handy while debugging)
+       *  Share
        **********************************************************************/
       shareBtn.addEventListener("click", function(){
         var url = window.location.href;
@@ -1784,9 +1859,8 @@
         if(navigator.share){
           navigator.share({ title: "Valentine 💖", text: text, url: url }).then(function(){
             showToast("Shared 💌");
-          }).catch(function(){ /* user canceled */ });
+          }).catch(function(){});
         }else{
-          // fallback: copy link
           if(navigator.clipboard && navigator.clipboard.writeText){
             navigator.clipboard.writeText(url).then(function(){
               showToast("Link copied ✨");
@@ -1799,40 +1873,30 @@
         }
       });
 
-      resetBtn.addEventListener("click", function(){
-        // For you while testing. Remove this button later if you want.
-        state.accepted = false;
-        state.noCount = 0;
-        state.opened = { letter:false, wheel:false, coupon:false };
-        state.chosenIdea = "";
-        state.couponRevealed = false;
-        saveStateSoon();
-
-        yesScale = 1;
-        applyYesScale();
-        setNoLabel();
-        updateLoveMeter();
-        reasonBox.classList.remove("show");
-        hint.style.display = "";
-
-        closeModal();
-        showAskScreen();
-        placeButtons();
-
-        showToast("Reset done");
+      /**********************************************************************
+       *  Resize handling
+       **********************************************************************/
+      window.addEventListener("resize", function(){
+        resizeBg();
+        initBgHearts();
+        resizeConfettiCanvas();
+        if(screenAsk.classList.contains("active")) placeButtons();
+        if(overlay.classList.contains("open") && currentModalPage === "coupon") setupScratchCanvas();
       });
 
       /**********************************************************************
        *  Init
        **********************************************************************/
       function init(){
+        startBg();
         buildMemories();
-        updateGiftBadges();
         setNoLabel();
         updateLoveMeter();
-
-        // Ensure buttons are placed after layout
         placeButtons();
+
+        // Confetti canvas sizing
+        resizeConfettiCanvas();
+        ensureConfetti();
 
         if(state.accepted){
           showYesScreen();
@@ -1847,4 +1911,3 @@
   </script>
 </body>
 </html>
-```
