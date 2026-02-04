@@ -1293,7 +1293,8 @@
       }
 
       function updateLoveMeter(){
-        var pct = clamp(Math.round((state.noCount / 12) * 100), 0, 100);
+        // starts at 100% and drops toward 0% as noCount increases (0..12+)
+        var pct = clamp(100 - Math.round((state.noCount / 12) * 100), 0, 100);
         loveLevel.textContent = pct + "%";
         meterFill.style.width = pct + "%";
       }
@@ -1846,3 +1847,4 @@
   </script>
 </body>
 </html>
+
