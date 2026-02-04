@@ -5,68 +5,47 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#ff3b7a" />
-  <meta name="description" content="A tiny interactive Valentine experience 💘" />
   <title>Will you be my Valentine?</title>
 
-  <!-- Confetti library -->
-  <link rel="preconnect" href="https://cdn.jsdelivr.net" />
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+  <!-- Confetti (optional). Page still works if this fails to load. -->
+  <script defer src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
 
   <style>
     :root{
-      --bg1:#ffd1e8;
-      --bg2:#fff2f9;
-      --bg3:#ffe3f0;
-      --ink:#1a1a1a;
-
+      --bg1:#ffd6e7;
+      --bg2:#ffeef6;
       --card:#ffffffcc;
-      --stroke:#ffffff66;
-      --shadow:0 18px 70px rgba(0,0,0,.16);
+      --stroke: rgba(255,255,255,.55);
+      --shadow: 0 18px 60px rgba(0,0,0,.15);
+      --ink:#141414;
+      --muted: rgba(0,0,0,.65);
 
       --yes:#ff3b7a;
       --yesHover:#ff1f68;
 
-      --chip:#ffffffb3;
-
-      --muted:rgba(0,0,0,.62);
-
-      --radius:24px;
+      --radius: 22px;
     }
 
     *{ box-sizing:border-box; }
     html,body{ height:100%; }
+
     body{
       margin:0;
+      min-height:100vh;
       min-height:100svh;
       display:grid;
       place-items:center;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
-      color:var(--ink);
-      background:
-        radial-gradient(1200px 700px at 20% -10%, var(--bg2), transparent 55%),
-        radial-gradient(900px 600px at 110% 20%, var(--bg3), transparent 55%),
-        radial-gradient(circle at 50% 0%, #ffffff, var(--bg1));
+      background: radial-gradient(circle at top, var(--bg2), var(--bg1));
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji","Segoe UI Emoji";
       overflow:hidden;
       padding:
         calc(14px + env(safe-area-inset-top))
         calc(14px + env(safe-area-inset-right))
         calc(14px + env(safe-area-inset-bottom))
         calc(14px + env(safe-area-inset-left));
+      color: var(--ink);
     }
 
-    /* Ambient background hearts canvas */
-    #bgCanvas{
-      position:fixed;
-      inset:0;
-      width:100vw;
-      height:100vh;
-      z-index:0;
-      pointer-events:none;
-      opacity:.85;
-      filter:saturate(1.1);
-    }
-
-    /* Confetti canvas */
     #confettiCanvas{
       position:fixed;
       inset:0;
@@ -76,65 +55,30 @@
       z-index:9999;
     }
 
-    .floating-controls{
-      position:fixed;
-      top: max(12px, env(safe-area-inset-top));
-      right: max(12px, env(safe-area-inset-right));
-      display:flex;
-      gap:10px;
-      z-index:10000;
-    }
-    .float-btn{
-      border:1px solid var(--stroke);
-      background:rgba(255,255,255,.72);
-      backdrop-filter: blur(10px);
-      box-shadow: 0 10px 30px rgba(0,0,0,.12);
-      width:44px;
-      height:44px;
-      border-radius:999px;
-      cursor:pointer;
-      display:grid;
-      place-items:center;
-      font-size:18px;
-      user-select:none;
-      -webkit-tap-highlight-color: transparent;
-      transition: transform .12s ease, background .12s ease;
-    }
-    .float-btn:hover{ transform: translateY(-1px); }
-    .float-btn:active{ transform: translateY(1px) scale(.98); }
-    .float-btn:focus-visible{
-      outline:3px solid rgba(255,59,122,.35);
-      outline-offset:3px;
-    }
-    .float-btn[aria-pressed="true"]{
-      background: rgba(255, 59, 122, .18);
-      border-color: rgba(255, 59, 122, .35);
-    }
-
     .card{
+      width:min(860px, 94vw);
+      background: var(--card);
+      border: 1px solid var(--stroke);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      text-align:center;
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      overflow:hidden;
       position:relative;
       z-index:2;
-      width:min(860px, 94vw);
-      border-radius: var(--radius);
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.82), rgba(255,255,255,.68)) padding-box,
-        conic-gradient(from 180deg, rgba(255,59,122,.55), rgba(255,210,230,.55), rgba(255,59,122,.55)) border-box;
-      border: 2px solid transparent;
-      box-shadow: var(--shadow);
-      backdrop-filter: blur(12px);
-      overflow:hidden;
     }
 
-    .card-inner{
-      padding: 26px 22px 22px;
+    .inner{
+      padding: 22px 18px 18px;
     }
 
-    .top-row{
+    .topbar{
       display:flex;
-      align-items:center;
       justify-content:space-between;
-      gap:12px;
-      margin-bottom:10px;
+      align-items:center;
+      gap:10px;
+      margin-bottom: 10px;
     }
 
     .pill{
@@ -142,55 +86,71 @@
       align-items:center;
       gap:8px;
       padding: 8px 12px;
-      border-radius:999px;
-      border:1px solid var(--stroke);
-      background: var(--chip);
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.55);
+      background: rgba(255,255,255,.62);
       font-size: 13px;
       color: var(--muted);
       user-select:none;
     }
-    .pill b{ color: var(--ink); font-weight:800; }
+    .pill b{ color: var(--ink); font-weight: 900; }
 
-    .tap-hint{
-      font-size:12px;
-      opacity:.75;
+    .mini-actions{
+      display:flex;
+      gap:8px;
+    }
+
+    .icon-btn{
+      width: 40px;
+      height: 40px;
+      border-radius: 999px;
+      border: 1px solid rgba(255,255,255,.55);
+      background: rgba(255,255,255,.62);
+      cursor:pointer;
+      font-size: 16px;
+      display:grid;
+      place-items:center;
+      box-shadow: 0 10px 24px rgba(0,0,0,.10);
+      -webkit-tap-highlight-color: transparent;
       user-select:none;
-      text-align:right;
+      transition: transform .12s ease;
+    }
+    .icon-btn:active{ transform: translateY(1px) scale(.99); }
+    .icon-btn:focus-visible{
+      outline: 3px solid rgba(255,59,122,.33);
+      outline-offset: 3px;
     }
 
     .screen{ display:none; }
-    .screen.active{ display:block; animation: pop .35s ease; }
-
+    .screen.active{ display:block; animation: pop .28s ease; }
     @keyframes pop{
       from{ transform: scale(.985); opacity:0; }
       to{ transform: scale(1); opacity:1; }
     }
 
     .art{
-      width: min(300px, 84vw);
-      margin: 8px auto 0;
+      width: min(280px, 84vw);
+      margin: 6px auto 0;
       display:block;
-      filter: drop-shadow(0 12px 18px rgba(0,0,0,.12));
+      filter: drop-shadow(0 10px 14px rgba(0,0,0,.12));
     }
 
     h1{
       font-size: clamp(26px, 4.2vw, 46px);
-      margin: 14px 0 10px;
+      margin: 12px 0 8px;
       letter-spacing:-.02em;
       line-height: 1.05;
-      text-align:center;
     }
 
     .sub{
-      margin: 0 auto 16px;
-      max-width: 60ch;
-      text-align:center;
+      margin: 0 auto 14px;
+      max-width: 62ch;
       color: var(--muted);
+      line-height: 1.45;
       font-size: 15px;
-      line-height: 1.4;
     }
 
-    .button-zone{
+    .zone{
       position:relative;
       width: min(560px, 96%);
       height: 170px;
@@ -198,10 +158,8 @@
       touch-action:none;
     }
 
-    button.action{
+    .action{
       position:absolute;
-      top: 54%;
-      transform: translateY(-50%);
       padding: 16px 24px;
       font-size: 18px;
       font-weight: 900;
@@ -212,132 +170,101 @@
       user-select:none;
       -webkit-tap-highlight-color: transparent;
       transition: transform .12s ease, background .12s ease, filter .12s ease;
-    }
-    button.action:focus-visible{
-      outline: 3px solid rgba(255,59,122,.33);
-      outline-offset: 4px;
+      transform-origin: center;
     }
 
     #yesBtn{
-      left: 12%;
       background: var(--yes);
       color:#fff;
-      transform: translateY(-50%) scale(1);
     }
     #yesBtn:hover{ background: var(--yesHover); }
     #yesBtn:active{ filter: brightness(.98); }
 
     #noBtn{
-      left: 66%;
       background: #e9eaf1;
       color:#111827;
+    }
+
+    .action:focus-visible{
+      outline: 3px solid rgba(255,59,122,.33);
+      outline-offset: 4px;
     }
 
     .hint{
       margin-top: 10px;
       font-size: 13px;
-      opacity: .75;
-      text-align:center;
+      opacity: .78;
       user-select:none;
     }
 
     .reason{
       margin: 12px auto 0;
       width:min(560px, 96%);
-      border:1px dashed rgba(255,59,122,.35);
-      background: rgba(255, 255, 255, .55);
+      border: 1px dashed rgba(255,59,122,.35);
+      background: rgba(255,255,255,.55);
       border-radius: 16px;
       padding: 10px 12px;
       font-size: 14px;
       color: rgba(0,0,0,.72);
-      display:flex;
+      display:none;
       gap:10px;
       align-items:flex-start;
-      min-height: 44px;
+      text-align:left;
     }
+    .reason.show{ display:flex; }
     .reason .emoji{ font-size: 18px; line-height: 1; }
     .reason .text{ line-height: 1.25; }
-    .reason.hidden{ display:none; }
 
     .meter{
       margin: 14px auto 0;
       width:min(560px, 96%);
+      height: 14px;
       background: rgba(0,0,0,.06);
       border-radius:999px;
       overflow:hidden;
       border: 1px solid rgba(0,0,0,.06);
-      position:relative;
-      height: 14px;
     }
     .meter .fill{
-      height: 100%;
-      width: 0%;
+      height:100%;
+      width:0%;
       background: linear-gradient(90deg, rgba(255,59,122,.35), rgba(255,59,122,.85));
       border-radius:999px;
-      transition: width .22s ease;
-    }
-    .meter-label{
-      margin: 8px auto 0;
-      width:min(560px, 96%);
-      display:flex;
-      justify-content:space-between;
-      font-size: 12px;
-      color: var(--muted);
-      user-select:none;
+      transition: width .18s ease;
     }
 
-    /* YES SCREEN */
-    .yay{
-      text-align:center;
-      margin-top: 6px;
-    }
-    .yay h2{
-      margin: 10px 0 6px;
-      font-size: clamp(22px, 3.6vw, 34px);
-      letter-spacing:-.02em;
-    }
-    .yay p{
-      margin: 0 auto 14px;
-      max-width: 62ch;
-      color: var(--muted);
-      line-height: 1.45;
-      font-size: 15px;
-    }
-
-    .gifts{
+    /* YES screen */
+    .grid{
       display:grid;
-      grid-template-columns: repeat(2, minmax(0,1fr));
+      grid-template-columns: repeat(2, minmax(0, 1fr));
       gap:12px;
-      width:min(720px, 100%);
+      width:min(740px, 100%);
       margin: 14px auto 0;
     }
-    @media (min-width: 720px){
-      .gifts{ grid-template-columns: repeat(4, minmax(0,1fr)); }
+    @media (min-width: 740px){
+      .grid{ grid-template-columns: repeat(3, minmax(0, 1fr)); }
     }
 
     .gift{
-      border:1px solid var(--stroke);
+      border:1px solid rgba(255,255,255,.55);
       background: rgba(255,255,255,.62);
       border-radius: 18px;
       padding: 14px 12px;
       cursor:pointer;
       box-shadow: 0 10px 22px rgba(0,0,0,.10);
-      transition: transform .12s ease, background .12s ease;
+      -webkit-tap-highlight-color: transparent;
+      transition: transform .12s ease;
       text-align:left;
       display:flex;
       gap:10px;
       align-items:flex-start;
-      min-height: 84px;
+      min-height: 88px;
       position:relative;
-      -webkit-tap-highlight-color: transparent;
     }
-    .gift:hover{ transform: translateY(-2px); }
     .gift:active{ transform: translateY(1px) scale(.99); }
     .gift:focus-visible{
-      outline:3px solid rgba(255,59,122,.33);
-      outline-offset:4px;
+      outline: 3px solid rgba(255,59,122,.33);
+      outline-offset: 4px;
     }
-
     .gift .icon{
       width: 40px;
       height: 40px;
@@ -350,12 +277,11 @@
       flex: 0 0 auto;
       user-select:none;
     }
-
     .gift .title{
-      font-weight: 900;
+      font-weight: 950;
       font-size: 13px;
-      letter-spacing:.01em;
       margin-top: 2px;
+      letter-spacing:.01em;
     }
     .gift .desc{
       font-size: 12px;
@@ -363,8 +289,7 @@
       margin-top: 3px;
       line-height: 1.25;
     }
-
-    .gift .badge{
+    .badge{
       position:absolute;
       top: 10px;
       right: 10px;
@@ -372,8 +297,8 @@
       padding: 4px 8px;
       border-radius:999px;
       background: rgba(0,0,0,.06);
-      color: rgba(0,0,0,.7);
-      border:1px solid rgba(0,0,0,.08);
+      border: 1px solid rgba(0,0,0,.08);
+      color: rgba(0,0,0,.68);
       user-select:none;
     }
     .gift.opened .badge{
@@ -384,9 +309,10 @@
 
     .memories{
       margin: 16px auto 0;
-      width:min(720px, 100%);
-      border-top:1px solid rgba(0,0,0,.06);
+      width:min(740px, 100%);
+      border-top: 1px solid rgba(0,0,0,.06);
       padding-top: 14px;
+      text-align:left;
     }
     .memories h3{
       margin: 0 0 10px;
@@ -403,21 +329,16 @@
       grid-template-columns: repeat(2, minmax(0,1fr));
       gap: 12px;
     }
-    @media (min-width: 720px){
+    @media (min-width: 740px){
       .polaroids{ grid-template-columns: repeat(3, minmax(0,1fr)); }
     }
-
     .polaroid{
       border-radius: 18px;
-      border:1px solid var(--stroke);
+      border:1px solid rgba(255,255,255,.55);
       background: rgba(255,255,255,.72);
       padding: 12px;
       box-shadow: 0 10px 22px rgba(0,0,0,.10);
-      transform: rotate(var(--rot, 0deg));
-      transition: transform .14s ease;
-      cursor: default;
     }
-    .polaroid:hover{ transform: rotate(var(--rot, 0deg)) translateY(-2px); }
     .polaroid .img{
       border-radius: 14px;
       height: 86px;
@@ -433,7 +354,7 @@
     }
     .polaroid .cap{
       margin-top: 10px;
-      font-weight: 800;
+      font-weight: 900;
       font-size: 13px;
     }
     .polaroid .note{
@@ -443,12 +364,12 @@
       line-height: 1.25;
     }
 
-    /* MODALS */
+    /* Modal (single robust overlay) */
     .overlay{
       position:fixed;
       inset:0;
       background: rgba(0,0,0,.38);
-      z-index:10001;
+      z-index:10000;
       display:none;
       padding:
         calc(14px + env(safe-area-inset-top))
@@ -463,21 +384,22 @@
       max-height: min(78svh, 760px);
       overflow:auto;
       border-radius: 22px;
-      background: rgba(255,255,255,.90);
+      background: rgba(255,255,255,.92);
       border:1px solid rgba(255,255,255,.55);
       box-shadow: 0 20px 80px rgba(0,0,0,.25);
       backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       padding: 16px 16px 14px;
       position:relative;
-      animation: pop .18s ease;
     }
 
     .modal-head{
       display:flex;
-      align-items:flex-start;
       justify-content:space-between;
+      align-items:flex-start;
       gap:12px;
       margin-bottom: 10px;
+      text-align:left;
     }
     .modal-title{
       font-weight: 950;
@@ -490,7 +412,6 @@
       font-size: 13px;
       line-height: 1.3;
     }
-
     .close-btn{
       border:1px solid rgba(0,0,0,.08);
       background: rgba(0,0,0,.04);
@@ -505,17 +426,20 @@
       transition: transform .12s ease;
       flex: 0 0 auto;
     }
-    .close-btn:hover{ transform: translateY(-1px); }
     .close-btn:active{ transform: translateY(1px); }
     .close-btn:focus-visible{
-      outline:3px solid rgba(255,59,122,.33);
-      outline-offset:3px;
+      outline: 3px solid rgba(255,59,122,.33);
+      outline-offset: 3px;
     }
 
     .modal-body{
       border-top:1px solid rgba(0,0,0,.06);
       padding-top: 12px;
+      text-align:left;
     }
+
+    .modal-page{ display:none; }
+    .modal-page.active{ display:block; }
 
     /* Letter */
     .letter{
@@ -528,25 +452,28 @@
       border-radius: 18px;
       padding: 14px;
     }
-    .letter .sig{
-      margin-top: 10px;
-      font-weight: 900;
-    }
 
     /* Wheel */
     .wheel-wrap{
       display:grid;
       grid-template-columns: 1fr;
-      gap: 14px;
-      align-items:center;
+      gap: 12px;
     }
     @media (min-width: 860px){
       .wheel-wrap{
-        grid-template-columns: 360px 1fr;
+        grid-template-columns: 340px 1fr;
         gap: 16px;
+        align-items:start;
       }
     }
-
+    .pointer{
+      width:0;height:0;
+      border-left: 14px solid transparent;
+      border-right: 14px solid transparent;
+      border-bottom: 22px solid rgba(255,59,122,.95);
+      margin: 0 auto -10px;
+      filter: drop-shadow(0 10px 12px rgba(0,0,0,.14));
+    }
     .wheel{
       width: 320px;
       height: 320px;
@@ -555,22 +482,18 @@
       box-shadow: 0 14px 40px rgba(0,0,0,.16);
       margin: 0 auto;
       position:relative;
+      user-select:none;
       background: conic-gradient(
-        rgba(255,59,122,.75) 0deg 36deg,
-        rgba(255,170,200,.75) 36deg 72deg,
-        rgba(255,59,122,.55) 72deg 108deg,
-        rgba(255,210,230,.75) 108deg 144deg,
-        rgba(255,59,122,.70) 144deg 180deg,
-        rgba(255,170,200,.70) 180deg 216deg,
-        rgba(255,59,122,.55) 216deg 252deg,
-        rgba(255,210,230,.75) 252deg 288deg,
-        rgba(255,59,122,.70) 288deg 324deg,
-        rgba(255,170,200,.70) 324deg 360deg
+        rgba(255,59,122,.78),
+        rgba(255,170,200,.78),
+        rgba(255,210,230,.78),
+        rgba(255,59,122,.78),
+        rgba(255,170,200,.78),
+        rgba(255,210,230,.78)
       );
       transform: rotate(0deg);
-      transition: transform 4.2s cubic-bezier(.10,.82,.12,1);
+      transition: transform 4s cubic-bezier(.10,.82,.12,1);
       overflow:hidden;
-      user-select:none;
     }
     .wheel::after{
       content:"";
@@ -597,45 +520,34 @@
       letter-spacing: .02em;
       box-shadow: 0 10px 24px rgba(0,0,0,.12);
     }
-    .pointer{
-      width:0;height:0;
-      border-left: 14px solid transparent;
-      border-right: 14px solid transparent;
-      border-bottom: 22px solid rgba(255,59,122,.95);
-      margin: 0 auto -10px;
-      filter: drop-shadow(0 10px 12px rgba(0,0,0,.14));
-    }
 
-    .wheel-actions{
+    .row{
       display:flex;
       gap:10px;
       flex-wrap:wrap;
-      justify-content:flex-start;
       align-items:center;
-      margin-top: 6px;
+      margin-top: 10px;
     }
-
     .btn{
       border:none;
       border-radius: 999px;
       padding: 12px 16px;
       font-weight: 900;
       cursor:pointer;
-      box-shadow: 0 10px 22px rgba(0,0,0,.10);
       -webkit-tap-highlight-color: transparent;
-      transition: transform .12s ease, filter .12s ease, background .12s ease;
+      transition: transform .12s ease, background .12s ease;
     }
     .btn:active{ transform: translateY(1px) scale(.99); }
-    .btn:focus-visible{ outline:3px solid rgba(255,59,122,.33); outline-offset:4px; }
-
+    .btn:focus-visible{
+      outline: 3px solid rgba(255,59,122,.33);
+      outline-offset: 4px;
+    }
     .btn.primary{ background: var(--yes); color:#fff; }
     .btn.primary:hover{ background: var(--yesHover); }
-
     .btn.ghost{
       background: rgba(0,0,0,.05);
       color: rgba(0,0,0,.8);
       border: 1px solid rgba(0,0,0,.08);
-      box-shadow:none;
     }
 
     .result-box{
@@ -646,14 +558,12 @@
       line-height: 1.35;
       color: rgba(0,0,0,.8);
     }
-    .result-box b{ font-weight: 950; }
 
     .ideas{
       margin: 10px 0 0;
       padding: 0;
       list-style:none;
       display:grid;
-      grid-template-columns: 1fr;
       gap: 8px;
     }
     .ideas li{
@@ -664,7 +574,6 @@
       color: rgba(0,0,0,.72);
       font-size: 13px;
       display:flex;
-      align-items:center;
       justify-content:space-between;
       gap: 12px;
     }
@@ -674,13 +583,13 @@
       color: rgba(0,0,0,.84);
       font-weight: 800;
     }
-    .ideas li .tag{
+    .ideas .tag{
       font-size: 12px;
       color: rgba(0,0,0,.55);
       white-space:nowrap;
     }
 
-    /* Scratch */
+    /* Coupon scratch */
     .coupon{
       border-radius: 20px;
       background:
@@ -689,8 +598,6 @@
         rgba(255,255,255,.72);
       border: 1px solid rgba(255,59,122,.18);
       padding: 14px;
-      position:relative;
-      overflow:hidden;
     }
     .coupon h4{
       margin: 0 0 6px;
@@ -712,6 +619,7 @@
       font-size: 13px;
     }
     .scratch-wrap{
+      margin-top: 10px;
       position:relative;
       border-radius: 18px;
       overflow:hidden;
@@ -746,52 +654,6 @@
       max-width: 48ch;
     }
 
-    /* Selfie */
-    .selfie-grid{
-      display:grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
-    }
-    @media (min-width: 860px){
-      .selfie-grid{
-        grid-template-columns: 1fr 1fr;
-        align-items:start;
-      }
-    }
-
-    .video-box, .photo-box{
-      border-radius: 18px;
-      border: 1px solid rgba(0,0,0,.06);
-      background: rgba(0,0,0,.03);
-      overflow:hidden;
-      position:relative;
-    }
-
-    video{
-      width:100%;
-      height:auto;
-      display:block;
-      transform: scaleX(-1);
-      background: #111;
-      aspect-ratio: 4/3;
-      object-fit: cover;
-    }
-    #selfieCanvasOut{
-      width:100%;
-      height:auto;
-      display:block;
-      background:#111;
-      aspect-ratio: 4/3;
-      object-fit: cover;
-      border-radius: 0;
-    }
-
-    .mini-note{
-      font-size: 13px;
-      color: rgba(0,0,0,.65);
-      line-height:1.35;
-    }
-
     /* Toast */
     .toast{
       position: fixed;
@@ -800,10 +662,11 @@
       transform: translateX(-50%) translateY(20px);
       opacity: 0;
       pointer-events:none;
-      z-index: 10002;
+      z-index: 10001;
       background: rgba(255,255,255,.80);
       border: 1px solid rgba(255,255,255,.55);
       backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
       box-shadow: 0 16px 46px rgba(0,0,0,.18);
       border-radius: 999px;
       padding: 10px 14px;
@@ -821,33 +684,29 @@
       transform: translateX(-50%) translateY(0px);
     }
 
-    /* Reduced motion */
     @media (prefers-reduced-motion: reduce){
-      *{ animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; scroll-behavior: auto !important; }
-      #bgCanvas{ display:none; }
+      *{ transition-duration: .001ms !important; animation-duration: .001ms !important; }
+      .wheel{ transition-duration: .001ms !important; }
     }
   </style>
 </head>
 
 <body>
-  <canvas id="bgCanvas"></canvas>
   <canvas id="confettiCanvas"></canvas>
 
-  <div class="floating-controls" aria-label="Page controls">
-    <button class="float-btn" id="musicBtn" aria-pressed="false" title="Toggle cute music">♪</button>
-    <button class="float-btn" id="shareBtn" title="Share">⤴</button>
-  </div>
-
-  <main class="card" role="application" aria-label="Valentine page">
-    <div class="card-inner">
-      <div class="top-row">
-        <div class="pill" id="statusPill">💌 <span>Love level:</span> <b id="loveLevel">0%</b></div>
-        <div class="tap-hint" id="tapHint">Tap anywhere for hearts ✨</div>
+  <main class="card" aria-label="Valentine page">
+    <div class="inner">
+      <div class="topbar">
+        <div class="pill">💌 <span>Love level:</span> <b id="loveLevel">0%</b></div>
+        <div class="mini-actions">
+          <button class="icon-btn" id="shareBtn" title="Share / Copy link" aria-label="Share">⤴</button>
+          <button class="icon-btn" id="resetBtn" title="Reset (for testing)" aria-label="Reset">↺</button>
+        </div>
       </div>
 
       <!-- ASK SCREEN -->
       <section class="screen active" id="screenAsk">
-        <!-- Cute animated bear-ish SVG holding heart -->
+        <!-- Cute SVG -->
         <svg class="art" viewBox="0 0 320 240" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
           <defs>
             <linearGradient id="fur" x1="0" x2="1">
@@ -858,94 +717,63 @@
               <stop offset="0" stop-color="#ff4d7d"/>
               <stop offset="1" stop-color="#ff1f68"/>
             </linearGradient>
-            <filter id="soft" x="-30%" y="-30%" width="160%" height="160%">
-              <feGaussianBlur stdDeviation="1.5" result="b"/>
-              <feMerge>
-                <feMergeNode in="b"/>
-                <feMergeNode in="SourceGraphic"/>
-              </feMerge>
-            </filter>
           </defs>
-
-          <!-- floating hearts -->
-          <g filter="url(#soft)" opacity=".9">
-            <path d="M42 62 C42 50 56 45 64 54 C72 45 86 50 86 62 C86 80 64 88 64 98 C64 88 42 80 42 62Z" fill="url(#heart)"/>
-            <path d="M252 30 C252 18 266 13 274 22 C282 13 296 18 296 30 C296 48 274 56 274 66 C274 56 252 48 252 30Z" fill="url(#heart)"/>
-          </g>
-
-          <!-- body -->
+          <path d="M250 50 C250 33 270 25 282 38
+                   C294 25 314 33 314 50
+                   C314 78 282 92 282 106
+                   C282 92 250 78 250 50Z" fill="url(#heart)"/>
           <path d="M90 120 C90 70 140 40 190 60
                    C240 40 290 70 290 120
                    C290 180 240 210 190 210
                    C140 210 90 180 90 120Z" fill="url(#fur)"/>
-          <!-- ears -->
           <path d="M110 92 L95 55 L140 78 Z" fill="#f2a97b"/>
           <path d="M270 92 L285 55 L240 78 Z" fill="#f2a97b"/>
-          <!-- eyes -->
           <circle cx="160" cy="130" r="8"/>
           <circle cx="220" cy="130" r="8"/>
-          <!-- nose heart -->
           <path d="M190 144 C186 144 182 148 182 152
                    C182 160 190 164 190 170
                    C190 164 198 160 198 152
                    C198 148 194 144 190 144Z" fill="#ff7aa2"/>
-
-          <!-- holding heart -->
-          <path d="M115 160 C115 144 130 136 142 145
-                   C154 136 170 144 170 160
-                   C170 184 142 192 142 208
-                   C142 192 115 184 115 160Z" fill="url(#heart)"/>
-          <path d="M238 160 C238 144 253 136 265 145
-                   C277 136 293 144 293 160
-                   C293 184 265 192 265 208
-                   C265 192 238 184 238 160Z" fill="url(#heart)" opacity=".25"/>
         </svg>
 
         <h1 id="questionTitle">Kalani, will you be my Valentine?</h1>
         <p class="sub" id="questionSub">
-          Warning: the “No” button is on ✨hard mode✨. Also… I added surprises. 👀
+          Warning: the “No” button is on hard mode 😈
         </p>
 
-        <section class="button-zone" id="zone" aria-label="Answer buttons">
-          <button class="action" id="yesBtn" aria-label="Yes">Yes 💖</button>
-          <button class="action" id="noBtn" aria-label="No">No</button>
+        <section class="zone" id="zone" aria-label="Answer buttons">
+          <button class="action" id="yesBtn">Yes 💖</button>
+          <button class="action" id="noBtn">No</button>
         </section>
 
         <div class="hint" id="hint">Try tapping “No” 😈</div>
 
-        <div class="reason hidden" id="reasonBox" aria-live="polite">
+        <div class="reason" id="reasonBox" aria-live="polite">
           <div class="emoji" id="reasonEmoji">💬</div>
           <div class="text" id="reasonText"></div>
         </div>
 
         <div class="meter" aria-hidden="true"><div class="fill" id="meterFill"></div></div>
-        <div class="meter-label" aria-hidden="true">
-          <span>Suspiciously calm</span>
-          <span>Okay fine… destiny</span>
-        </div>
       </section>
 
       <!-- YES SCREEN -->
       <section class="screen" id="screenYes">
-        <div class="yay">
-          <h2 id="yayTitle">YAY! Officially my Valentine 💘</h2>
-          <p id="yayText">
-            You just unlocked: a love letter, a date-idea spinner, a scratch-off coupon, and a cute selfie booth.
-            (Yes, I’m extra. It’s for you.)
-          </p>
-        </div>
+        <h1 id="yayTitle">YAY! Officially my Valentine 💘</h1>
+        <p class="sub" id="yayText">
+          You unlocked a love letter, a date spinner, and a scratch-off coupon. (I’m extra. It’s for you.)
+        </p>
 
-        <div class="gifts" aria-label="Surprises">
-          <button class="gift" id="giftLetter" data-modal="letterModal">
+        <div class="grid" aria-label="Surprises">
+          <button class="gift" id="giftLetter" data-page="letter">
             <div class="icon">💌</div>
             <div>
               <div class="title">Open Love Letter</div>
-              <div class="desc">Typewriter mode. Expect feelings.</div>
+              <div class="desc">Cute. Sappy. Accurate.</div>
             </div>
             <div class="badge">Locked</div>
           </button>
 
-          <button class="gift" id="giftWheel" data-modal="wheelModal">
+          <button class="gift" id="giftWheel" data-page="wheel">
             <div class="icon">🎡</div>
             <div>
               <div class="title">Spin a Date Idea</div>
@@ -954,20 +782,11 @@
             <div class="badge">Locked</div>
           </button>
 
-          <button class="gift" id="giftScratch" data-modal="scratchModal">
+          <button class="gift" id="giftCoupon" data-page="coupon">
             <div class="icon">🎟️</div>
             <div>
               <div class="title">Scratch-Off Coupon</div>
-              <div class="desc">Redeemable for kisses. (Serious.)</div>
-            </div>
-            <div class="badge">Locked</div>
-          </button>
-
-          <button class="gift" id="giftSelfie" data-modal="selfieModal">
-            <div class="icon">📸</div>
-            <div>
-              <div class="title">Selfie Booth</div>
-              <div class="desc">Take a cute pic with heart sprinkles.</div>
+              <div class="desc">Redeemable for kisses.</div>
             </div>
             <div class="badge">Locked</div>
           </button>
@@ -979,137 +798,78 @@
         </div>
 
         <div class="hint" style="margin-top:14px;">
-          P.S. This page remembers what you unlocked — so it stays cute even if you refresh 🫶
+          P.S. This page remembers what you unlocked — even if you refresh 🫶
         </div>
       </section>
     </div>
   </main>
 
-  <!-- MODAL: LETTER -->
-  <div class="overlay" id="letterModal" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-label="Love letter">
+  <!-- Single modal overlay (robust + simple) -->
+  <div class="overlay" id="overlay" aria-hidden="true">
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
       <div class="modal-head">
         <div>
-          <div class="modal-title">💌 A love letter for you</div>
-          <div class="modal-sub">This one’s permanent. Like my choice of you.</div>
+          <div class="modal-title" id="modalTitle">Modal</div>
+          <div class="modal-sub" id="modalSub">Sub</div>
         </div>
-        <button class="close-btn" data-close="letterModal" aria-label="Close">✕</button>
+        <button class="close-btn" id="closeModalBtn" aria-label="Close">✕</button>
       </div>
-      <div class="modal-body">
-        <div class="letter" id="letterText"></div>
-        <div class="wheel-actions" style="margin-top:12px;">
-          <button class="btn ghost" id="copyLetterBtn">Copy letter</button>
-          <button class="btn primary" id="miniConfettiBtn">More confetti</button>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- MODAL: WHEEL -->
-  <div class="overlay" id="wheelModal" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-label="Date idea spinner">
-      <div class="modal-head">
-        <div>
-          <div class="modal-title">🎡 Spin the date idea wheel</div>
-          <div class="modal-sub">One spin = one plan. (I don’t make the rules. The wheel does.)</div>
-        </div>
-        <button class="close-btn" data-close="wheelModal" aria-label="Close">✕</button>
-      </div>
       <div class="modal-body">
-        <div class="wheel-wrap">
-          <div>
-            <div class="pointer" aria-hidden="true"></div>
-            <div class="wheel" id="wheel">
-              <div class="wheel-center">SPIN</div>
+        <!-- Letter -->
+        <section class="modal-page" id="page-letter">
+          <div class="letter" id="letterBox"></div>
+          <div class="row">
+            <button class="btn ghost" id="copyLetterBtn">Copy letter</button>
+            <button class="btn primary" id="moreConfettiBtn">More confetti</button>
+          </div>
+        </section>
+
+        <!-- Wheel -->
+        <section class="modal-page" id="page-wheel">
+          <div class="wheel-wrap">
+            <div>
+              <div class="pointer" aria-hidden="true"></div>
+              <div class="wheel" id="wheel">
+                <div class="wheel-center">SPIN</div>
+              </div>
+            </div>
+            <div>
+              <div class="result-box" id="wheelResult">
+                <b>Tip:</b> Hit <b>Spin</b> and I’ll pick something adorable for us 💞
+              </div>
+              <div class="row">
+                <button class="btn primary" id="spinBtn">Spin</button>
+                <button class="btn ghost" id="copyIdeaBtn" disabled>Copy idea</button>
+                <button class="btn ghost" id="icsBtn" disabled>Download .ics</button>
+              </div>
+              <ul class="ideas" id="ideaList"></ul>
             </div>
           </div>
+        </section>
 
-          <div>
-            <div class="result-box" id="wheelResult">
-              <b>Tip:</b> Hit <b>Spin</b> and I’ll pick something adorable for us 💞
+        <!-- Coupon -->
+        <section class="modal-page" id="page-coupon">
+          <div class="coupon">
+            <h4>Limited edition</h4>
+            <p class="big" id="couponTitle">Redeem for: one (1) perfect date</p>
+            <p class="small" id="couponDesc">Scratch the area below with your finger ✨</p>
+          </div>
+
+          <div class="scratch-wrap" aria-label="Scratch area">
+            <div class="scratch-hidden">
+              <div class="msg" id="scratchMsg">💖 100 KISSES 💖</div>
+              <div class="submsg" id="scratchSubmsg">Redeemable whenever you want. No expiration. (I also get to hug you after.)</div>
             </div>
-
-            <div class="wheel-actions">
-              <button class="btn primary" id="spinBtn">Spin</button>
-              <button class="btn ghost" id="copyIdeaBtn" disabled>Copy idea</button>
-              <button class="btn ghost" id="icsBtn" disabled>Download calendar invite (.ics)</button>
-            </div>
-
-            <ul class="ideas" id="ideaList"></ul>
-
-            <p class="mini-note" style="margin:10px 0 0;">
-              Want to customize ideas? Scroll to the <b>SETTINGS</b> in the script and edit <code>dateIdeas</code> 🫶
-            </p>
+            <canvas id="scratchCanvas"></canvas>
           </div>
-        </div>
-      </div>
-    </div>
-  </div>
 
-  <!-- MODAL: SCRATCH -->
-  <div class="overlay" id="scratchModal" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-label="Scratch-off coupon">
-      <div class="modal-head">
-        <div>
-          <div class="modal-title">🎟️ Scratch-off coupon</div>
-          <div class="modal-sub">Scratch to reveal your reward. (Yes, it’s real. Yes, it’s cute.)</div>
-        </div>
-        <button class="close-btn" data-close="scratchModal" aria-label="Close">✕</button>
-      </div>
-      <div class="modal-body">
-        <div class="coupon">
-          <h4>Limited edition</h4>
-          <p class="big" id="couponTitle">Redeem for: one (1) perfect date</p>
-          <p class="small" id="couponDesc">Scratch the area below. Pro tip: use your finger like a tiny detective.</p>
-        </div>
-
-        <div style="height:10px;"></div>
-
-        <div class="scratch-wrap" aria-label="Scratch area">
-          <div class="scratch-hidden" aria-hidden="false">
-            <div class="msg" id="scratchMsg">💖 100 KISSES 💖</div>
-            <div class="submsg" id="scratchSubmsg">Redeemable whenever you want. No expiration. No fine print. (Okay, tiny fine print: I get to hug you after.)</div>
+          <div class="row">
+            <button class="btn ghost" id="revealBtn">Reveal (if scratching is buggy)</button>
+            <button class="btn ghost" id="resetScratchBtn">Reset scratch</button>
+            <button class="btn primary" id="claimBtn" disabled>Claim reward</button>
           </div>
-          <canvas id="scratchCanvas"></canvas>
-        </div>
-
-        <div class="wheel-actions" style="margin-top:12px;">
-          <button class="btn ghost" id="resetScratchBtn">Reset scratch</button>
-          <button class="btn primary" id="claimBtn" disabled>Claim reward</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- MODAL: SELFIE -->
-  <div class="overlay" id="selfieModal" aria-hidden="true">
-    <div class="modal" role="dialog" aria-modal="true" aria-label="Selfie booth">
-      <div class="modal-head">
-        <div>
-          <div class="modal-title">📸 Selfie booth</div>
-          <div class="modal-sub">Optional, but highly encouraged. I want to see your cute face 🥹</div>
-        </div>
-        <button class="close-btn" data-close="selfieModal" aria-label="Close">✕</button>
-      </div>
-      <div class="modal-body">
-        <div class="selfie-grid">
-          <div class="video-box">
-            <video id="video" playsinline autoplay muted></video>
-          </div>
-          <div class="photo-box">
-            <canvas id="selfieCanvasOut"></canvas>
-          </div>
-        </div>
-
-        <div class="wheel-actions" style="margin-top:12px;">
-          <button class="btn primary" id="startCamBtn">Start camera</button>
-          <button class="btn ghost" id="snapBtn" disabled>Snap 💘</button>
-          <a class="btn ghost" id="saveBtn" download="valentine-selfie.png" style="text-decoration:none; display:inline-flex; align-items:center; justify-content:center;" aria-disabled="true">Save photo</a>
-        </div>
-
-        <p class="mini-note" style="margin:10px 0 0;">
-          Camera permission is only for this page in your browser — nothing gets uploaded anywhere.
-        </p>
+        </section>
       </div>
     </div>
   </div>
@@ -1117,1212 +877,973 @@
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
   <script>
-    /**********************************************************************
-     *  💖 CUSTOMIZE ME (THE ONLY PART YOU *NEED* TO EDIT)
-     **********************************************************************/
-    const SETTINGS = {
-      herName: "Kalani",
-      yourName: "Rishi",
+    (function(){
+      "use strict";
 
-      questionLine: "will you be my Valentine?",
-      questionSub: "Warning: the “No” button is on ✨hard mode✨. Also… I added surprises. 👀",
+      /**********************************************************************
+       *  ✅ ROBUST SETTINGS (edit these)
+       **********************************************************************/
+      var SETTINGS = {
+        herName: "Kalani",
+        yourName: "Rishi",
 
-      // Cute “No” sabotage lines + “reasons” that pop up while she tries to hit No
-      noLines: ["No", "Nope", "Nuh-uh", "Absolutely not", "Nice try", "Still no", "I’m resisting", "Stoppp 😭", "…maybe?", "Okay fine"],
-      reasons: [
-        "Because I like you an unreasonable amount.",
-        "Because your laugh is basically my favorite sound.",
-        "Because you make normal days feel like highlights.",
-        "Because I’m down bad (respectfully).",
-        "Because you’re my safe place — even from far away.",
-        "Because your smile is literally a cheat code.",
-        "Because I want more memories with you — the real kind.",
-        "Because you + me = my favorite team.",
-        "Because I’m choosing you. Every time.",
-        "Because I already told the universe. No take-backs."
-      ],
+        questionLine: "will you be my Valentine?",
+        questionSub: "Warning: the “No” button is on hard mode 😈",
 
-      // The “memory lane” cards (emoji + title + tiny note)
-      memories: [
-        { emoji: "🌙", title: "Late-night talks", note: "When time disappears because it’s you." },
-        { emoji: "😂", title: "Your laugh", note: "Instant serotonin. Every single time." },
-        { emoji: "🫶", title: "You & me", note: "The easiest yes I’ve ever had." },
-        { emoji: "🍓", title: "Little things", note: "The small moments that stay big in my heart." },
-        { emoji: "📍", title: "Future plans", note: "More dates. More hugs. More us." },
-        { emoji: "💫", title: "My favorite person", note: "You, on purpose, always." },
-      ],
+        noLabels: ["No", "Nope", "Nuh-uh", "Nice try", "Stoppp 😭", "Still no", "…maybe?", "Okay fine"],
 
-      // Love letter (typed out)
-      letter: [
-        "Hi " + "Kalani" + " 💖",
-        "I made this little page because I wanted something that feels like *us*: playful, a little dramatic, and way too cute for no reason (except you’re worth it).",
-        "Thank you for being my person — the one I want to tell everything to, celebrate everything with, and choose on the good days and the messy ones.",
-        "Even when life is busy or distance is annoying, you’re still my favorite thought, my favorite notification, and my favorite future.",
-        "So… happy Valentine’s Day, baby. I’m really grateful it’s you.",
-        "",
-        "Love,",
-        "Rishi"
-      ],
+        reasons: [
+          "Because I like you an unreasonable amount.",
+          "Because your laugh is basically my favorite sound.",
+          "Because you make normal days feel like highlights.",
+          "Because I’m choosing you. Every time.",
+          "Because you’re my favorite person — on purpose."
+        ],
 
-      // Spinner ideas (edit these to match your vibe)
-      dateIdeas: [
-        "Dress up + fancy dinner + take cute pics",
-        "Home movie night + snacks + blanket fort",
-        "Coffee date + bookstore + pick each other a book",
-        "Cook together + taste test + “chef kiss” rating",
-        "Sunset drive + music + park stop",
-        "Game night: winner gets kisses (spoiler: you win)",
-        "Dessert crawl (we try 3 places, no regrets)",
-        "Museum / aquarium date + matching outfits",
-        "Paint night at home + keep the canvases forever",
-        "Write each other little letters + swap"
-      ],
+        memories: [
+          { emoji: "🌙", title: "Late-night talks", note: "Time disappears because it’s you." },
+          { emoji: "😂", title: "Your laugh", note: "Instant serotonin. Every time." },
+          { emoji: "🫶", title: "You & me", note: "My easiest yes." },
+          { emoji: "🍓", title: "Little things", note: "The small moments that stay big." },
+          { emoji: "📍", title: "Future plans", note: "More dates. More hugs. More us." },
+          { emoji: "💫", title: "My favorite person", note: "You, always." }
+        ],
 
-      // Calendar invite defaults (for the .ics download)
-      // Change these to your real plan if you want:
-      ics: {
-        year: 2026,
-        month: 2,
-        day: 14,
-        hour: 19,      // 7 PM
-        minute: 0,
-        durationHours: 3,
-        location: "Somewhere cute 🥰"
-      },
+        letter: [
+          "Hi {HER} 💖",
+          "I made this page because I wanted something that feels like *us*: playful, a little dramatic, and way too cute for no reason (except you’re worth it).",
+          "Thank you for being my person — the one I want to tell everything to, celebrate everything with, and choose on the good days and the messy ones.",
+          "Even when life is busy or distance is annoying, you’re still my favorite thought, my favorite notification, and my favorite future.",
+          "Happy Valentine’s Day, baby. I’m really grateful it’s you.",
+          "",
+          "Love,",
+          "{ME}"
+        ],
 
-      // Scratch-off reveal text
-      scratch: {
-        title: "Redeem for: one (1) perfect date",
-        desc: "Scratch the area below. Pro tip: use your finger like a tiny detective.",
-        revealBig: "💖 100 KISSES 💖",
-        revealSmall: "Redeemable whenever you want. No expiration. No fine print. (Okay, tiny fine print: I get to hug you after.)"
-      }
-    };
+        dateIdeas: [
+          "Dress up + fancy dinner + cute pics",
+          "Movie night + snacks + blanket fort",
+          "Coffee date + bookstore + pick each other a book",
+          "Cook together + taste test + ‘chef kiss’ ratings",
+          "Sunset drive + music + park stop",
+          "Game night: winner gets kisses (you win)",
+          "Dessert crawl (3 places, no regrets)",
+          "Museum / aquarium date + matching outfits",
+          "Paint night at home + keep the canvases",
+          "Write each other mini letters + swap"
+        ],
 
-    /**********************************************************************
-     *  STATE (persists on refresh)
-     **********************************************************************/
-    const STORAGE_KEY = "valentine_page_state_v2";
-    const defaultState = {
-      accepted: false,
-      noCount: 0,
-      opened: { letter: false, wheel: false, scratch: false, selfie: false },
-      chosenIdea: "",
-      scratchRevealed: false
-    };
+        // Calendar invite defaults (local time)
+        ics: { year: 2026, month: 2, day: 14, hour: 19, minute: 0, durationHours: 3, location: "Somewhere cute 🥰" },
 
-    function loadState(){
-      try{
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if(!raw) return structuredClone(defaultState);
-        const parsed = JSON.parse(raw);
-        return {
-          ...structuredClone(defaultState),
-          ...parsed,
-          opened: { ...structuredClone(defaultState.opened), ...(parsed.opened || {}) }
-        };
-      }catch{
-        return structuredClone(defaultState);
-      }
-    }
-    function saveState(){
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
-    }
-    let state = loadState();
-
-    /**********************************************************************
-     *  ELEMENTS
-     **********************************************************************/
-    const screenAsk = document.getElementById("screenAsk");
-    const screenYes = document.getElementById("screenYes");
-
-    const questionTitle = document.getElementById("questionTitle");
-    const questionSub = document.getElementById("questionSub");
-
-    const zone = document.getElementById("zone");
-    const yesBtn = document.getElementById("yesBtn");
-    const noBtn = document.getElementById("noBtn");
-    const hint = document.getElementById("hint");
-
-    const reasonBox = document.getElementById("reasonBox");
-    const reasonText = document.getElementById("reasonText");
-    const reasonEmoji = document.getElementById("reasonEmoji");
-
-    const meterFill = document.getElementById("meterFill");
-    const loveLevel = document.getElementById("loveLevel");
-    const statusPill = document.getElementById("statusPill");
-
-    const yayTitle = document.getElementById("yayTitle");
-    const yayText = document.getElementById("yayText");
-
-    const letterModal = document.getElementById("letterModal");
-    const wheelModal = document.getElementById("wheelModal");
-    const scratchModal = document.getElementById("scratchModal");
-    const selfieModal = document.getElementById("selfieModal");
-
-    const letterText = document.getElementById("letterText");
-    const copyLetterBtn = document.getElementById("copyLetterBtn");
-    const miniConfettiBtn = document.getElementById("miniConfettiBtn");
-
-    const wheel = document.getElementById("wheel");
-    const spinBtn = document.getElementById("spinBtn");
-    const wheelResult = document.getElementById("wheelResult");
-    const ideaList = document.getElementById("ideaList");
-    const copyIdeaBtn = document.getElementById("copyIdeaBtn");
-    const icsBtn = document.getElementById("icsBtn");
-
-    const couponTitle = document.getElementById("couponTitle");
-    const couponDesc = document.getElementById("couponDesc");
-    const scratchCanvas = document.getElementById("scratchCanvas");
-    const scratchMsg = document.getElementById("scratchMsg");
-    const scratchSubmsg = document.getElementById("scratchSubmsg");
-    const resetScratchBtn = document.getElementById("resetScratchBtn");
-    const claimBtn = document.getElementById("claimBtn");
-
-    const polaroids = document.getElementById("polaroids");
-
-    const toast = document.getElementById("toast");
-
-    const musicBtn = document.getElementById("musicBtn");
-    const shareBtn = document.getElementById("shareBtn");
-
-    const video = document.getElementById("video");
-    const selfieCanvasOut = document.getElementById("selfieCanvasOut");
-    const startCamBtn = document.getElementById("startCamBtn");
-    const snapBtn = document.getElementById("snapBtn");
-    const saveBtn = document.getElementById("saveBtn");
-
-    const giftLetter = document.getElementById("giftLetter");
-    const giftWheel = document.getElementById("giftWheel");
-    const giftScratch = document.getElementById("giftScratch");
-    const giftSelfie = document.getElementById("giftSelfie");
-
-    /**********************************************************************
-     *  PERSONALIZE TEXT
-     **********************************************************************/
-    questionTitle.textContent = `${SETTINGS.herName}, ${SETTINGS.questionLine}`;
-    questionSub.textContent = SETTINGS.questionSub;
-
-    // Letter uses SETTINGS.letter; but we’ll replace hard-coded name in case you edit it.
-    // (Keeps it flexible.)
-    function buildLetterText(){
-      const lines = SETTINGS.letter.map(line => {
-        return line.replaceAll("Kalani", SETTINGS.herName).replaceAll("Rishi", SETTINGS.yourName);
-      });
-      return lines.join("\n\n");
-    }
-
-    couponTitle.textContent = SETTINGS.scratch.title;
-    couponDesc.textContent = SETTINGS.scratch.desc;
-    scratchMsg.textContent = SETTINGS.scratch.revealBig;
-    scratchSubmsg.textContent = SETTINGS.scratch.revealSmall;
-
-    /**********************************************************************
-     *  CONFETTI (with safe fallback)
-     **********************************************************************/
-    const confettiCanvas = document.getElementById("confettiCanvas");
-    let confettiInstance = null;
-
-    function resizeConfettiCanvas(){
-      const dpr = Math.max(1, window.devicePixelRatio || 1);
-      confettiCanvas.width = Math.floor(window.innerWidth * dpr);
-      confettiCanvas.height = Math.floor(window.innerHeight * dpr);
-    }
-    resizeConfettiCanvas();
-    window.addEventListener("resize", resizeConfettiCanvas);
-
-    function initConfetti(){
-      if (window.confetti && typeof window.confetti.create === "function"){
-        confettiInstance = window.confetti.create(confettiCanvas, { resize: false, useWorker: true });
-      }
-    }
-    initConfetti();
-
-    function burstConfetti(opts = {}){
-      if(!confettiInstance) return;
-      confettiInstance({
-        particleCount: opts.particleCount ?? 140,
-        spread: opts.spread ?? 100,
-        startVelocity: opts.startVelocity ?? 34,
-        origin: opts.origin ?? { x: 0.5, y: 0.45 },
-        scalar: opts.scalar ?? 1,
-        ticks: opts.ticks ?? 250
-      });
-    }
-    function confettiRain(durationMs = 1200){
-      if(!confettiInstance) return;
-      const end = Date.now() + durationMs;
-      (function frame(){
-        confettiInstance({
-          particleCount: 7,
-          spread: 90,
-          startVelocity: 28,
-          origin: { x: Math.random(), y: Math.random() * 0.25 },
-          ticks: 180
-        });
-        if(Date.now() < end) requestAnimationFrame(frame);
-      })();
-    }
-
-    /**********************************************************************
-     *  AMBIENT HEARTS BACKGROUND
-     **********************************************************************/
-    const bgCanvas = document.getElementById("bgCanvas");
-    const bgCtx = bgCanvas.getContext("2d");
-    let hearts = [];
-    let bgDpr = 1;
-
-    function resizeBg(){
-      bgDpr = Math.max(1, window.devicePixelRatio || 1);
-      bgCanvas.width = Math.floor(window.innerWidth * bgDpr);
-      bgCanvas.height = Math.floor(window.innerHeight * bgDpr);
-      bgCanvas.style.width = window.innerWidth + "px";
-      bgCanvas.style.height = window.innerHeight + "px";
-    }
-    resizeBg();
-    window.addEventListener("resize", resizeBg);
-
-    function rand(min, max){ return Math.random() * (max - min) + min; }
-    function pick(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
-
-    function spawnHeart(){
-      const size = rand(12, 26);
-      return {
-        x: rand(0, bgCanvas.width),
-        y: bgCanvas.height + rand(0, bgCanvas.height * 0.25),
-        vy: rand(0.30, 0.85) * bgDpr,
-        vx: rand(-0.18, 0.18) * bgDpr,
-        size,
-        rot: rand(-0.5, 0.5),
-        vr: rand(-0.006, 0.006),
-        alpha: rand(0.18, 0.42),
-        char: pick(["❤","💗","💖","💕"])
+        coupon: {
+          title: "Redeem for: one (1) perfect date",
+          desc: "Scratch the area below with your finger ✨",
+          revealBig: "💖 100 KISSES 💖",
+          revealSmall: "Redeemable whenever you want. No expiration. (I also get to hug you after.)"
+        }
       };
-    }
 
-    function initHearts(){
-      hearts = [];
-      const count = Math.floor(Math.min(42, Math.max(18, window.innerWidth / 28)));
-      for(let i=0;i<count;i++){
-        const h = spawnHeart();
-        h.y = rand(0, bgCanvas.height);
-        hearts.push(h);
-      }
-    }
-    initHearts();
-
-    let lastBg = performance.now();
-    function drawBg(t){
-      const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-      if(reduceMotion) return; // CSS already hides it, but double-safe.
-
-      const dt = Math.min(0.04, (t - lastBg) / 1000);
-      lastBg = t;
-
-      bgCtx.clearRect(0,0,bgCanvas.width,bgCanvas.height);
-      bgCtx.save();
-      bgCtx.scale(1,1);
-
-      for(const h of hearts){
-        h.x += (h.vx * 60) * dt;
-        h.y -= (h.vy * 60) * dt;
-        h.rot += (h.vr * 60) * dt;
-
-        if(h.y < -60){
-          Object.assign(h, spawnHeart());
-        }
-        if(h.x < -60) h.x = bgCanvas.width + 60;
-        if(h.x > bgCanvas.width + 60) h.x = -60;
-
-        bgCtx.save();
-        bgCtx.globalAlpha = h.alpha;
-        bgCtx.translate(h.x, h.y);
-        bgCtx.rotate(h.rot);
-        bgCtx.font = `${h.size}px ui-sans-serif, system-ui`;
-        bgCtx.textAlign = "center";
-        bgCtx.textBaseline = "middle";
-        bgCtx.fillText(h.char, 0, 0);
-        bgCtx.restore();
+      /**********************************************************************
+       *  Helpers
+       **********************************************************************/
+      function $(id){ return document.getElementById(id); }
+      function clamp(n, a, b){ return Math.max(a, Math.min(b, n)); }
+      function pick(arr){ return arr[Math.floor(Math.random() * arr.length)]; }
+      function prefersReducedMotion(){
+        return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
       }
 
-      bgCtx.restore();
-      requestAnimationFrame(drawBg);
-    }
-    requestAnimationFrame(drawBg);
+      /**********************************************************************
+       *  State (safe localStorage)
+       **********************************************************************/
+      var STATE_KEY = "valentine_state_v3";
+      var state = {
+        accepted: false,
+        noCount: 0,
+        opened: { letter:false, wheel:false, coupon:false },
+        chosenIdea: "",
+        couponRevealed: false
+      };
 
-    /**********************************************************************
-     *  MICRO AUDIO (cute synth—no copyrighted music)
-     **********************************************************************/
-    let audioCtx = null;
-    let musicOn = false;
-    let musicTimer = null;
-    let masterGain = null;
-
-    function ensureAudio(){
-      if(audioCtx) return;
-      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      masterGain = audioCtx.createGain();
-      masterGain.gain.value = 0.08;
-      masterGain.connect(audioCtx.destination);
-    }
-
-    function blip(freq = 660, dur = 0.08){
-      try{
-        ensureAudio();
-        const o = audioCtx.createOscillator();
-        const g = audioCtx.createGain();
-        o.type = "triangle";
-        o.frequency.value = freq;
-
-        g.gain.setValueAtTime(0.0001, audioCtx.currentTime);
-        g.gain.exponentialRampToValueAtTime(0.22, audioCtx.currentTime + 0.01);
-        g.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + dur);
-
-        o.connect(g);
-        g.connect(masterGain);
-        o.start();
-        o.stop(audioCtx.currentTime + dur + 0.02);
-      }catch{}
-    }
-
-    const CHORDS = [
-      [261.63, 329.63, 392.00], // C
-      [293.66, 369.99, 440.00], // D
-      [329.63, 415.30, 493.88], // E
-      [349.23, 440.00, 523.25]  // F
-    ];
-    let chordIdx = 0;
-
-    function playChord(){
-      if(!musicOn) return;
-      ensureAudio();
-      const now = audioCtx.currentTime;
-      const chord = CHORDS[chordIdx % CHORDS.length];
-      chordIdx++;
-
-      chord.forEach((f, i) => {
-        const o = audioCtx.createOscillator();
-        const g = audioCtx.createGain();
-        o.type = i === 0 ? "sine" : "triangle";
-        o.frequency.value = f;
-
-        const attack = 0.02;
-        const release = 0.22;
-        const hold = 0.35;
-
-        g.gain.setValueAtTime(0.0001, now);
-        g.gain.exponentialRampToValueAtTime(0.20 / (i+1.7), now + attack);
-        g.gain.exponentialRampToValueAtTime(0.0001, now + attack + hold + release);
-
-        o.connect(g);
-        g.connect(masterGain);
-        o.start(now);
-        o.stop(now + attack + hold + release + 0.02);
-      });
-
-      // tiny sparkle
-      if(Math.random() < 0.5) blip(880 + Math.random()*220, 0.06);
-    }
-
-    function startMusic(){
-      if(musicTimer) return;
-      musicOn = true;
-      musicBtn.setAttribute("aria-pressed","true");
-      showToast("Music: ON ♪");
-      playChord();
-      musicTimer = setInterval(playChord, 900);
-    }
-    function stopMusic(){
-      musicOn = false;
-      musicBtn.setAttribute("aria-pressed","false");
-      showToast("Music: OFF");
-      if(musicTimer){
-        clearInterval(musicTimer);
-        musicTimer = null;
-      }
-    }
-
-    musicBtn.addEventListener("click", () => {
-      // Must be user gesture to start audio
-      if(!musicOn) startMusic();
-      else stopMusic();
-    });
-
-    /**********************************************************************
-     *  TAP ANYWHERE = HEART POP (small confetti burst + audio blip)
-     **********************************************************************/
-    function miniHeartsAt(x, y){
-      if(!confettiInstance) return;
-      const rect = confettiCanvas.getBoundingClientRect();
-      const ox = Math.min(1, Math.max(0, x / rect.width));
-      const oy = Math.min(1, Math.max(0, y / rect.height));
-      confettiInstance({
-        particleCount: 18,
-        spread: 70,
-        startVelocity: 22,
-        ticks: 180,
-        scalar: 0.9,
-        origin: { x: ox, y: oy }
-      });
-    }
-
-    document.addEventListener("pointerdown", (e) => {
-      // avoid when clicking buttons inside modals? (still fine)
-      miniHeartsAt(e.clientX, e.clientY);
-      blip(740 + Math.random()*260, 0.05);
-    }, { passive:true });
-
-    /**********************************************************************
-     *  TOAST
-     **********************************************************************/
-    let toastTimer = null;
-    function showToast(msg){
-      toast.textContent = msg;
-      toast.classList.add("show");
-      if(toastTimer) clearTimeout(toastTimer);
-      toastTimer = setTimeout(() => toast.classList.remove("show"), 1700);
-    }
-
-    /**********************************************************************
-     *  NO BUTTON CHAOS + LOVE METER
-     **********************************************************************/
-    let yesScale = 1;
-
-    function setLoveMeter(){
-      // cap at 100
-      const pct = Math.max(0, Math.min(100, Math.round((state.noCount / 12) * 100)));
-      meterFill.style.width = pct + "%";
-      loveLevel.textContent = pct + "%";
-      statusPill.innerHTML = `💌 <span>Love level:</span> <b id="loveLevel">${pct}%</b>`;
-    }
-
-    function growYes(){
-      yesScale = Math.min(2.35, yesScale + 0.10);
-      yesBtn.style.transform = `translateY(-50%) scale(${yesScale})`;
-    }
-
-    function setNoLabel(){
-      const idx = Math.min(SETTINGS.noLines.length - 1, state.noCount);
-      noBtn.textContent = SETTINGS.noLines[idx];
-    }
-
-    function showReason(){
-      const line = pick(SETTINGS.reasons);
-      reasonEmoji.textContent = pick(["💬","😌","🫶","😈","🥹","💖"]);
-      reasonText.textContent = line;
-      reasonBox.classList.remove("hidden");
-    }
-
-    function moveNo(px, py){
-      const z = zone.getBoundingClientRect();
-      const b = noBtn.getBoundingClientRect();
-
-      // vector from pointer to button center
-      let dx = (b.left + b.width/2) - px;
-      let dy = (b.top + b.height/2) - py;
-      let mag = Math.hypot(dx, dy) || 1;
-      dx /= mag; dy /= mag;
-
-      // move away but keep within zone
-      const step = 160;
-      let newLeft = (b.left - z.left) + dx * step;
-      let newTop  = (b.top - z.top) + dy * step;
-
-      newLeft = Math.max(0, Math.min(newLeft, z.width - b.width));
-      newTop  = Math.max(0, Math.min(newTop, z.height - b.height));
-
-      noBtn.style.left = newLeft + "px";
-      noBtn.style.top  = newTop + "px";
-      noBtn.style.transform = "none";
-    }
-
-    function handleNoAttempt(px, py){
-      state.noCount++;
-      saveState();
-
-      setNoLabel();
-      setLoveMeter();
-      showReason();
-      growYes();
-
-      moveNo(px, py);
-
-      // sprinkle feedback
-      miniHeartsAt(px, py);
-      blip(520 + Math.random()*220, 0.06);
-
-      if(state.noCount === 3) showToast("Nice try 😈");
-      if(state.noCount === 7) showToast("The universe says “YES”");
-      if(state.noCount === 10) showToast("Okay… just press Yes already 🥹");
-    }
-
-    zone.addEventListener("pointermove", (e) => {
-      const b = noBtn.getBoundingClientRect();
-      const d = Math.hypot(
-        (b.left + b.width/2) - e.clientX,
-        (b.top + b.height/2) - e.clientY
-      );
-      if(d < 150) handleNoAttempt(e.clientX, e.clientY);
-    });
-
-    noBtn.addEventListener("pointerdown", (e) => {
-      e.preventDefault();
-      handleNoAttempt(e.clientX, e.clientY);
-    });
-
-    noBtn.addEventListener("click", (e) => e.preventDefault());
-
-    /**********************************************************************
-     *  YES FLOW
-     **********************************************************************/
-    function showAsk(){
-      screenYes.classList.remove("active");
-      screenAsk.classList.add("active");
-    }
-    function showYes(){
-      screenAsk.classList.remove("active");
-      screenYes.classList.add("active");
-
-      hint.style.display = "none";
-      reasonBox.classList.add("hidden");
-
-      // delight
-      resizeConfettiCanvas();
-      burstConfetti({ particleCount: 220, spread: 120, origin: { x: 0.5, y: 0.5 } });
-      confettiRain(1200);
-      blip(880, 0.09);
-      setTimeout(() => blip(660, 0.09), 120);
-      setTimeout(() => blip(990, 0.09), 240);
-
-      showToast("She said YES 💘");
-    }
-
-    yesBtn.addEventListener("click", () => {
-      state.accepted = true;
-      saveState();
-      showYes();
-    });
-
-    /**********************************************************************
-     *  GIFTS + OPENED STATE
-     **********************************************************************/
-    function updateGiftBadges(){
-      const map = [
-        [giftLetter, state.opened.letter],
-        [giftWheel, state.opened.wheel],
-        [giftScratch, state.opened.scratch],
-        [giftSelfie, state.opened.selfie]
-      ];
-
-      map.forEach(([el, opened]) => {
-        el.classList.toggle("opened", opened);
-        const badge = el.querySelector(".badge");
-        badge.textContent = opened ? "Opened ✓" : "Locked";
-      });
-
-      // fun: if everything opened
-      const all = Object.values(state.opened).every(Boolean);
-      if(all){
-        yayTitle.textContent = `All surprises unlocked 😭💖`;
-        yayText.textContent = `Okay… you’re officially my favorite human, ${SETTINGS.herName}. Happy Valentine’s Day, baby.`;
-      }else{
-        yayTitle.textContent = `YAY! Officially my Valentine 💘`;
-        yayText.textContent =
-          `You just unlocked: a love letter, a date-idea spinner, a scratch-off coupon, and a cute selfie booth.
-          (Yes, I’m extra. It’s for you.)`;
-      }
-    }
-
-    function openModal(modalEl){
-      modalEl.classList.add("open");
-      modalEl.setAttribute("aria-hidden","false");
-      document.body.style.overflow = "hidden";
-    }
-    function closeModal(modalEl){
-      modalEl.classList.remove("open");
-      modalEl.setAttribute("aria-hidden","true");
-      document.body.style.overflow = "";
-    }
-
-    document.addEventListener("click", (e) => {
-      const closeId = e.target && e.target.getAttribute && e.target.getAttribute("data-close");
-      if(closeId){
-        closeModal(document.getElementById(closeId));
-        stopCamera();
-      }
-
-      // click outside modal to close
-      const overlays = [letterModal, wheelModal, scratchModal, selfieModal];
-      overlays.forEach(ov => {
-        if(e.target === ov) {
-          closeModal(ov);
-          stopCamera();
-        }
-      });
-    });
-
-    // Gift clicks
-    document.querySelectorAll(".gift").forEach(btn => {
-      btn.addEventListener("click", () => {
-        const modalId = btn.getAttribute("data-modal");
-        const modalEl = document.getElementById(modalId);
-
-        // mark opened
-        if(modalId === "letterModal") state.opened.letter = true;
-        if(modalId === "wheelModal") state.opened.wheel = true;
-        if(modalId === "scratchModal") state.opened.scratch = true;
-        if(modalId === "selfieModal") state.opened.selfie = true;
-
-        saveState();
-        updateGiftBadges();
-
-        openModal(modalEl);
-        burstConfetti({ particleCount: 90, spread: 90, origin: { x: 0.5, y: 0.35 }, scalar: 0.9 });
-      });
-    });
-
-    /**********************************************************************
-     *  LETTER MODAL: typewriter + copy + confetti
-     **********************************************************************/
-    let typingTimer = null;
-    function typeLetter(){
-      const full = buildLetterText();
-      letterText.textContent = "";
-      let i = 0;
-
-      if(typingTimer) cancelAnimationFrame(typingTimer);
-
-      const speed = window.matchMedia("(prefers-reduced-motion: reduce)").matches ? 9999 : 1;
-
-      function step(){
-        // type ~2-3 chars per frame for speed
-        const chunk = speed === 9999 ? full.length : 3;
-        i = Math.min(full.length, i + chunk);
-        letterText.textContent = full.slice(0, i);
-
-        if(i < full.length){
-          typingTimer = requestAnimationFrame(step);
-        }else{
-          // Add a little signature emphasis
-          // (no DOM replacement—just a tiny toast)
-          showToast("💌 Letter unlocked forever");
+      function loadState(){
+        try{
+          var raw = localStorage.getItem(STATE_KEY);
+          if(!raw) return;
+          var parsed = JSON.parse(raw);
+          if(parsed && typeof parsed === "object"){
+            state.accepted = !!parsed.accepted;
+            state.noCount = typeof parsed.noCount === "number" ? parsed.noCount : 0;
+            state.opened = parsed.opened && typeof parsed.opened === "object" ? {
+              letter: !!parsed.opened.letter,
+              wheel: !!parsed.opened.wheel,
+              coupon: !!parsed.opened.coupon
+            } : { letter:false, wheel:false, coupon:false };
+            state.chosenIdea = typeof parsed.chosenIdea === "string" ? parsed.chosenIdea : "";
+            state.couponRevealed = !!parsed.couponRevealed;
+          }
+        }catch(e){
+          // storage might be blocked; ignore safely
         }
       }
-      step();
-    }
 
-    // Start typing when opening letter modal
-    giftLetter.addEventListener("click", () => typeLetter());
-
-    copyLetterBtn.addEventListener("click", async () => {
-      try{
-        await navigator.clipboard.writeText(buildLetterText());
-        showToast("Copied 💖");
-        blip(880, 0.07);
-      }catch{
-        showToast("Copy blocked (it’s okay).");
+      var saveTimer = null;
+      function saveStateSoon(){
+        if(saveTimer) clearTimeout(saveTimer);
+        saveTimer = setTimeout(function(){
+          try{ localStorage.setItem(STATE_KEY, JSON.stringify(state)); }catch(e){}
+        }, 200);
       }
-    });
 
-    miniConfettiBtn.addEventListener("click", () => {
-      burstConfetti({ particleCount: 200, spread: 140, origin: { x: 0.5, y: 0.4 } });
-      confettiRain(900);
-      blip(990, 0.07);
-    });
+      loadState();
 
-    /**********************************************************************
-     *  WHEEL: build list + spin + copy + ICS download
-     **********************************************************************/
-    let wheelRotation = 0;
-    let spinning = false;
+      /**********************************************************************
+       *  Elements
+       **********************************************************************/
+      var confettiCanvas = $("confettiCanvas");
 
-    function buildIdeaList(){
-      ideaList.innerHTML = "";
-      SETTINGS.dateIdeas.forEach((idea, i) => {
-        const li = document.createElement("li");
-        li.innerHTML = `<span>${idea}</span><span class="tag">#${i+1}</span>`;
-        ideaList.appendChild(li);
-      });
-      highlightChosenIdea(state.chosenIdea);
-    }
+      var screenAsk = $("screenAsk");
+      var screenYes = $("screenYes");
 
-    function setWheelGradient(){
-      const n = SETTINGS.dateIdeas.length;
-      const slice = 360 / n;
-      const stops = [];
-      for(let i=0;i<n;i++){
-        const a0 = i * slice;
-        const a1 = (i+1) * slice;
-        // soft pink palette via HSL
-        const hue = 340 + (i * (70 / n));   // 340..410-ish
-        const color = `hsl(${hue} 88% 72% / 0.85)`;
-        const color2 = `hsl(${hue+10} 92% 64% / 0.80)`;
-        stops.push(`${color} ${a0}deg ${a1}deg`);
-        // add a subtle stripe feel by alternating
-        if(i % 2 === 0){
-          stops[i] = `${color2} ${a0}deg ${a1}deg`;
+      var questionTitle = $("questionTitle");
+      var questionSub = $("questionSub");
+
+      var zone = $("zone");
+      var yesBtn = $("yesBtn");
+      var noBtn = $("noBtn");
+
+      var hint = $("hint");
+      var reasonBox = $("reasonBox");
+      var reasonEmoji = $("reasonEmoji");
+      var reasonText = $("reasonText");
+
+      var loveLevel = $("loveLevel");
+      var meterFill = $("meterFill");
+
+      var polaroids = $("polaroids");
+
+      var overlay = $("overlay");
+      var modalTitle = $("modalTitle");
+      var modalSub = $("modalSub");
+      var closeModalBtn = $("closeModalBtn");
+
+      var pageLetter = $("page-letter");
+      var pageWheel  = $("page-wheel");
+      var pageCoupon = $("page-coupon");
+
+      var letterBox = $("letterBox");
+      var copyLetterBtn = $("copyLetterBtn");
+      var moreConfettiBtn = $("moreConfettiBtn");
+
+      var wheel = $("wheel");
+      var spinBtn = $("spinBtn");
+      var wheelResult = $("wheelResult");
+      var ideaList = $("ideaList");
+      var copyIdeaBtn = $("copyIdeaBtn");
+      var icsBtn = $("icsBtn");
+
+      var couponTitle = $("couponTitle");
+      var couponDesc = $("couponDesc");
+      var scratchCanvas = $("scratchCanvas");
+      var scratchMsg = $("scratchMsg");
+      var scratchSubmsg = $("scratchSubmsg");
+      var revealBtn = $("revealBtn");
+      var resetScratchBtn = $("resetScratchBtn");
+      var claimBtn = $("claimBtn");
+
+      var giftLetter = $("giftLetter");
+      var giftWheel = $("giftWheel");
+      var giftCoupon = $("giftCoupon");
+
+      var shareBtn = $("shareBtn");
+      var resetBtn = $("resetBtn");
+
+      var toast = $("toast");
+      var toastTimer = null;
+
+      /**********************************************************************
+       *  Personalize UI text
+       **********************************************************************/
+      questionTitle.textContent = SETTINGS.herName + ", " + SETTINGS.questionLine;
+      questionSub.textContent = SETTINGS.questionSub;
+
+      couponTitle.textContent = SETTINGS.coupon.title;
+      couponDesc.textContent = SETTINGS.coupon.desc;
+      scratchMsg.textContent = SETTINGS.coupon.revealBig;
+      scratchSubmsg.textContent = SETTINGS.coupon.revealSmall;
+
+      function buildLetterText(){
+        // No replaceAll (older Safari safety)
+        var lines = SETTINGS.letter.slice();
+        for(var i=0;i<lines.length;i++){
+          lines[i] = lines[i].split("{HER}").join(SETTINGS.herName);
+          lines[i] = lines[i].split("{ME}").join(SETTINGS.yourName);
+        }
+        return lines.join("\n\n");
+      }
+
+      /**********************************************************************
+       *  Confetti (safe init + safe calls)
+       **********************************************************************/
+      var confettiInstance = null;
+
+      function resizeConfettiCanvas(){
+        var dpr = Math.max(1, window.devicePixelRatio || 1);
+        confettiCanvas.width = Math.floor(window.innerWidth * dpr);
+        confettiCanvas.height = Math.floor(window.innerHeight * dpr);
+      }
+
+      function initConfettiSafe(){
+        resizeConfettiCanvas();
+        try{
+          if(window.confetti && typeof window.confetti.create === "function"){
+            confettiInstance = window.confetti.create(confettiCanvas, { resize: false, useWorker: true });
+          }
+        }catch(e){
+          confettiInstance = null;
         }
       }
-      wheel.style.background = `conic-gradient(${stops.join(",")})`;
-    }
 
-    function normalizeDeg(deg){
-      return ((deg % 360) + 360) % 360;
-    }
-
-    function pickIdeaFromRotation(rot){
-      const n = SETTINGS.dateIdeas.length;
-      const slice = 360 / n;
-
-      // wheel rotated clockwise by rot degrees; pointer at top selects original angle (360 - rot)
-      const deg = normalizeDeg(rot);
-      const pointerAngle = normalizeDeg(360 - deg); // 0..359.99
-      const idx = Math.floor(pointerAngle / slice);
-      return { idx, idea: SETTINGS.dateIdeas[idx] };
-    }
-
-    function highlightChosenIdea(idea){
-      const items = Array.from(ideaList.children);
-      items.forEach(li => li.classList.remove("selected"));
-      const idx = SETTINGS.dateIdeas.indexOf(idea);
-      if(idx >= 0 && items[idx]) items[idx].classList.add("selected");
-    }
-
-    function setWheelResult(idea){
-      wheelResult.innerHTML = `✅ The wheel chose: <b>${idea}</b><br><span style="color:rgba(0,0,0,.62); font-size:13px;">You + me. No excuses. Just vibes.</span>`;
-      copyIdeaBtn.disabled = false;
-      icsBtn.disabled = false;
-      highlightChosenIdea(idea);
-    }
-
-    spinBtn.addEventListener("click", () => {
-      if(spinning) return;
-      spinning = true;
-      copyIdeaBtn.disabled = true;
-      icsBtn.disabled = true;
-
-      const extra = 360 * (4 + Math.floor(Math.random()*3)) + Math.random()*360;
-      wheelRotation += extra;
-      wheel.style.transform = `rotate(${wheelRotation}deg)`;
-
-      blip(660, 0.06);
-      showToast("Spinning… 🎡");
-    });
-
-    wheel.addEventListener("transitionend", () => {
-      if(!spinning) return;
-      spinning = false;
-
-      const picked = pickIdeaFromRotation(wheelRotation);
-      state.chosenIdea = picked.idea;
-      saveState();
-
-      setWheelResult(picked.idea);
-      burstConfetti({ particleCount: 140, spread: 110, origin: { x: 0.5, y: 0.35 }, scalar: 0.95 });
-      blip(990, 0.08);
-    });
-
-    copyIdeaBtn.addEventListener("click", async () => {
-      try{
-        await navigator.clipboard.writeText(state.chosenIdea || "");
-        showToast("Idea copied 💞");
-        blip(880, 0.06);
-      }catch{
-        showToast("Copy blocked (still cute though).");
-      }
-    });
-
-    function formatICSDateUTC(d){
-      // YYYYMMDDTHHMMSSZ
-      const pad = n => String(n).padStart(2,"0");
-      return (
-        d.getUTCFullYear() +
-        pad(d.getUTCMonth()+1) +
-        pad(d.getUTCDate()) + "T" +
-        pad(d.getUTCHours()) +
-        pad(d.getUTCMinutes()) +
-        pad(d.getUTCSeconds()) + "Z"
-      );
-    }
-
-    function downloadICS(summary, description, location, startLocal, endLocal){
-      const uid = `${Date.now()}-${Math.random().toString(16).slice(2)}@valentine`;
-      const dtstamp = formatICSDateUTC(new Date());
-
-      const ics =
-`BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//Valentine//EN
-CALSCALE:GREGORIAN
-METHOD:PUBLISH
-BEGIN:VEVENT
-UID:${uid}
-DTSTAMP:${dtstamp}
-DTSTART:${formatICSDateUTC(startLocal)}
-DTEND:${formatICSDateUTC(endLocal)}
-SUMMARY:${summary.replace(/\n/g," ")}
-DESCRIPTION:${description.replace(/\n/g,"\\n")}
-LOCATION:${location.replace(/\n/g," ")}
-END:VEVENT
-END:VCALENDAR`;
-
-      const blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "valentine-date.ics";
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 800);
-    }
-
-    icsBtn.addEventListener("click", () => {
-      const i = SETTINGS.ics;
-      const start = new Date(i.year, i.month - 1, i.day, i.hour, i.minute, 0);
-      const end = new Date(start.getTime() + (i.durationHours * 60 * 60 * 1000));
-
-      const idea = state.chosenIdea || "Our Valentine Date 💖";
-      const summary = `Valentine Date: ${idea}`;
-      const desc = `Chosen by the wheel 🎡\n\nNote: Bring hugs. Bring kisses. Bring you.\n\nLove,\n${SETTINGS.yourName}`;
-      downloadICS(summary, desc, i.location, start, end);
-
-      showToast("Calendar invite downloaded 📅");
-      blip(740, 0.06);
-    });
-
-    /**********************************************************************
-     *  SCRATCH-OFF
-     **********************************************************************/
-    const scratchCtx = scratchCanvas.getContext("2d");
-    let scratchDown = false;
-    let scratchDone = false;
-    let scratchCheckTimer = null;
-
-    function resizeScratchCanvas(){
-      const dpr = Math.max(1, window.devicePixelRatio || 1);
-      const rect = scratchCanvas.getBoundingClientRect();
-      scratchCanvas.width = Math.floor(rect.width * dpr);
-      scratchCanvas.height = Math.floor(rect.height * dpr);
-      scratchCtx.setTransform(dpr,0,0,dpr,0,0);
-      drawScratchCover();
-    }
-
-    function drawScratchCover(){
-      scratchDone = state.scratchRevealed;
-      claimBtn.disabled = !scratchDone;
-
-      scratchCtx.globalCompositeOperation = "source-over";
-      scratchCtx.clearRect(0,0,scratchCanvas.width, scratchCanvas.height);
-
-      if(scratchDone){
-        // already revealed: clear cover
-        scratchCtx.clearRect(0,0,scratchCanvas.width, scratchCanvas.height);
-        return;
-      }
-
-      const rect = scratchCanvas.getBoundingClientRect();
-      const w = rect.width, h = rect.height;
-
-      // metallic-ish cover
-      const g = scratchCtx.createLinearGradient(0,0,w,h);
-      g.addColorStop(0, "rgba(120,120,140,.85)");
-      g.addColorStop(.5,"rgba(180,180,200,.85)");
-      g.addColorStop(1, "rgba(110,110,130,.85)");
-      scratchCtx.fillStyle = g;
-      scratchCtx.fillRect(0,0,w,h);
-
-      // subtle pattern
-      scratchCtx.globalAlpha = 0.22;
-      scratchCtx.fillStyle = "rgba(255,255,255,.9)";
-      for(let y=0;y<h;y+=28){
-        for(let x=0;x<w;x+=52){
-          scratchCtx.fillText("❤", x + (y%56 ? 10 : 0), y + 18);
-        }
-      }
-      scratchCtx.globalAlpha = 1;
-
-      // instruction
-      scratchCtx.fillStyle = "rgba(0,0,0,.55)";
-      scratchCtx.font = "900 16px ui-sans-serif, system-ui";
-      scratchCtx.textAlign = "center";
-      scratchCtx.textBaseline = "middle";
-      scratchCtx.fillText("SCRATCH HERE ✨", w/2, h/2);
-    }
-
-    function scratchAt(clientX, clientY){
-      if(scratchDone) return;
-      const rect = scratchCanvas.getBoundingClientRect();
-      const x = clientX - rect.left;
-      const y = clientY - rect.top;
-
-      scratchCtx.globalCompositeOperation = "destination-out";
-      scratchCtx.beginPath();
-      scratchCtx.arc(x, y, 18, 0, Math.PI*2);
-      scratchCtx.fill();
-      scratchCtx.globalCompositeOperation = "source-over";
-    }
-
-    function estimateScratchPercent(){
-      // sample pixels (lightweight)
-      const w = scratchCanvas.width;
-      const h = scratchCanvas.height;
-      const step = Math.max(8, Math.floor(Math.min(w,h) / 60));
-      const img = scratchCtx.getImageData(0,0,w,h).data;
-      let total = 0, clear = 0;
-
-      for(let y=0;y<h;y+=step){
-        for(let x=0;x<w;x+=step){
-          const idx = (y*w + x)*4 + 3; // alpha
-          total++;
-          if(img[idx] < 30) clear++;
-        }
-      }
-      return clear / total;
-    }
-
-    function checkScratchDone(){
-      if(scratchDone) return;
-      const pct = estimateScratchPercent();
-      if(pct > 0.58){
-        scratchDone = true;
-        state.scratchRevealed = true;
-        saveState();
-
-        // clear cover fully
-        scratchCtx.clearRect(0,0,scratchCanvas.width, scratchCanvas.height);
-        claimBtn.disabled = false;
-
-        burstConfetti({ particleCount: 220, spread: 130, origin: { x: 0.5, y: 0.40 } });
-        confettiRain(1000);
-        showToast("Reward revealed 😭💖");
-        blip(990, 0.08);
-      }
-    }
-
-    scratchCanvas.addEventListener("pointerdown", (e) => {
-      scratchDown = true;
-      scratchCanvas.setPointerCapture(e.pointerId);
-      scratchAt(e.clientX, e.clientY);
-      if(!scratchCheckTimer){
-        scratchCheckTimer = setInterval(checkScratchDone, 220);
-      }
-    });
-
-    scratchCanvas.addEventListener("pointermove", (e) => {
-      if(!scratchDown) return;
-      scratchAt(e.clientX, e.clientY);
-    });
-
-    function endScratch(){
-      scratchDown = false;
-      if(scratchCheckTimer){
-        clearInterval(scratchCheckTimer);
-        scratchCheckTimer = null;
-      }
-      checkScratchDone();
-    }
-
-    scratchCanvas.addEventListener("pointerup", endScratch);
-    scratchCanvas.addEventListener("pointercancel", endScratch);
-    scratchCanvas.addEventListener("lostpointercapture", endScratch);
-
-    resetScratchBtn.addEventListener("click", () => {
-      state.scratchRevealed = false;
-      saveState();
-      drawScratchCover();
-      showToast("Reset ✅");
-      blip(660, 0.06);
-    });
-
-    claimBtn.addEventListener("click", () => {
-      if(!state.scratchRevealed) return;
-      burstConfetti({ particleCount: 260, spread: 140, origin: { x: 0.5, y: 0.40 } });
-      confettiRain(1200);
-      showToast("Claimed 💋 (redeem immediately)");
-      blip(880, 0.08);
-    });
-
-    // Resize scratch canvas when modal opens
-    giftScratch.addEventListener("click", () => {
-      setTimeout(() => {
-        resizeScratchCanvas();
-        drawScratchCover();
-      }, 40);
-    });
-
-    window.addEventListener("resize", () => {
-      if(scratchModal.classList.contains("open")){
-        resizeScratchCanvas();
-        drawScratchCover();
-      }
-    });
-
-    /**********************************************************************
-     *  SELFIE BOOTH
-     **********************************************************************/
-    let camStream = null;
-
-    function stopCamera(){
-      if(camStream){
-        camStream.getTracks().forEach(t => t.stop());
-        camStream = null;
-      }
-      snapBtn.disabled = true;
-    }
-
-    async function startCamera(){
-      try{
-        camStream = await navigator.mediaDevices.getUserMedia({
-          video: { facingMode: "user" },
-          audio: false
+      function burstConfetti(){
+        if(!confettiInstance) return;
+        confettiInstance({
+          particleCount: 180,
+          spread: 110,
+          startVelocity: 34,
+          origin: { x: 0.5, y: 0.45 }
         });
-        video.srcObject = camStream;
-        await video.play();
-        snapBtn.disabled = false;
-        showToast("Camera ready 📸");
-      }catch(err){
-        showToast("Camera blocked (permission denied).");
       }
-    }
 
-    function drawHeartSprinkles(ctx, w, h){
-      const emojis = ["❤","💖","💗","💕"];
-      ctx.save();
-      ctx.globalAlpha = 0.85;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      for(let i=0;i<26;i++){
-        const x = rand(0, w);
-        const y = rand(0, h);
-        const s = rand(14, 26);
-        ctx.font = `${s}px ui-sans-serif, system-ui`;
-        ctx.fillText(pick(emojis), x, y);
+      function miniConfetti(){
+        if(!confettiInstance) return;
+        confettiInstance({
+          particleCount: 80,
+          spread: 120,
+          startVelocity: 28,
+          origin: { x: 0.5, y: 0.35 }
+        });
       }
-      ctx.restore();
-    }
 
-    function snapPhoto(){
-      const w = 960;
-      const h = 720;
-      selfieCanvasOut.width = w;
-      selfieCanvasOut.height = h;
-      const ctx = selfieCanvasOut.getContext("2d");
-
-      // Mirror to match video
-      ctx.save();
-      ctx.translate(w, 0);
-      ctx.scale(-1, 1);
-      ctx.drawImage(video, 0, 0, w, h);
-      ctx.restore();
-
-      // add soft overlay + hearts
-      ctx.fillStyle = "rgba(255,59,122,.08)";
-      ctx.fillRect(0,0,w,h);
-      drawHeartSprinkles(ctx, w, h);
-
-      // tiny caption
-      ctx.fillStyle = "rgba(255,255,255,.85)";
-      ctx.fillRect(22, h-74, w-44, 52);
-      ctx.fillStyle = "rgba(0,0,0,.78)";
-      ctx.font = "900 22px ui-sans-serif, system-ui";
-      ctx.textAlign = "left";
-      ctx.textBaseline = "middle";
-      ctx.fillText(`${SETTINGS.herName} + ${SETTINGS.yourName} 💘`, 40, h-48);
-
-      const url = selfieCanvasOut.toDataURL("image/png");
-      saveBtn.href = url;
-      saveBtn.setAttribute("aria-disabled","false");
-
-      burstConfetti({ particleCount: 160, spread: 120, origin: { x: 0.5, y: 0.35 }, scalar: 0.95 });
-      showToast("CUTEEE 😭💖");
-      blip(990, 0.07);
-    }
-
-    startCamBtn.addEventListener("click", startCamera);
-    snapBtn.addEventListener("click", snapPhoto);
-
-    giftSelfie.addEventListener("click", () => {
-      // clear output canvas
-      const ctx = selfieCanvasOut.getContext("2d");
-      selfieCanvasOut.width = 960;
-      selfieCanvasOut.height = 720;
-      ctx.fillStyle = "#111";
-      ctx.fillRect(0,0,selfieCanvasOut.width,selfieCanvasOut.height);
-      ctx.fillStyle = "rgba(255,255,255,.75)";
-      ctx.font = "900 18px ui-sans-serif, system-ui";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText("Start camera → Snap 💘", selfieCanvasOut.width/2, selfieCanvasOut.height/2);
-
-      saveBtn.removeAttribute("href");
-      saveBtn.setAttribute("aria-disabled","true");
-      snapBtn.disabled = true;
-    });
-
-    /**********************************************************************
-     *  SHARE BUTTON
-     **********************************************************************/
-    shareBtn.addEventListener("click", async () => {
-      const text = `💘 ${SETTINGS.herName}, will you be my Valentine?`;
-      const url = window.location.href;
-      if(navigator.share){
-        try{
-          await navigator.share({ title: "Valentine 💖", text, url });
-          showToast("Shared 💌");
-        }catch{
-          // ignore cancel
-        }
-      }else{
-        try{
-          await navigator.clipboard.writeText(url);
-          showToast("Link copied ✨");
-        }catch{
-          showToast("Sharing not supported here.");
-        }
-      }
-    });
-
-    /**********************************************************************
-     *  BUILD MEMORY LANE
-     **********************************************************************/
-    function buildPolaroids(){
-      polaroids.innerHTML = "";
-      SETTINGS.memories.forEach((m, i) => {
-        const card = document.createElement("div");
-        const rot = (Math.random() * 4 - 2).toFixed(2) + "deg";
-        card.className = "polaroid";
-        card.style.setProperty("--rot", rot);
-        card.innerHTML = `
-          <div class="img">${m.emoji}</div>
-          <div class="cap">${m.title}</div>
-          <div class="note">${m.note}</div>
-        `;
-        polaroids.appendChild(card);
+      window.addEventListener("resize", function(){
+        resizeConfettiCanvas();
+        // also keep buttons sane on resize if still on ask screen
+        if(screenAsk.classList.contains("active")) placeButtons();
+        if(overlay.classList.contains("open") && currentModalPage === "coupon") setupScratchCanvas();
       });
-    }
 
-    /**********************************************************************
-     *  INIT
-     **********************************************************************/
-    function init(){
-      // initial UI states
-      setNoLabel();
-      setLoveMeter();
-      buildIdeaList();
-      setWheelGradient();
-      buildPolaroids();
-      updateGiftBadges();
+      // Confetti script is deferred; init after a short tick to allow it to load.
+      setTimeout(initConfettiSafe, 0);
 
-      // If already accepted, show yes screen immediately
-      if(state.accepted){
-        showYes();
-        showToast("Welcome back, Valentine 💘");
-      }else{
-        showAsk();
+      /**********************************************************************
+       *  Toast
+       **********************************************************************/
+      function showToast(msg){
+        toast.textContent = msg;
+        toast.classList.add("show");
+        if(toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(function(){ toast.classList.remove("show"); }, 1600);
       }
-    }
-    init();
+
+      /**********************************************************************
+       *  Ask screen: button layout + “No” chaos (throttled)
+       **********************************************************************/
+      var yesScale = 1;
+      var lastNoMoveAt = 0;          // throttle movement + counters
+      var NO_COOLDOWN_MS = 260;      // prevents “noCount” exploding on pointermove
+      var NO_TRIGGER_DIST = 120;     // distance threshold
+
+      function placeButtons(){
+        // Put both buttons with explicit pixel coordinates (more robust than transforms)
+        var zW = zone.clientWidth;
+        var zH = zone.clientHeight;
+
+        var yTop = Math.round((zH - yesBtn.offsetHeight) / 2);
+        var nTop = Math.round((zH - noBtn.offsetHeight) / 2);
+
+        // centers at ~22% and ~78%
+        var yesLeft = Math.round(zW * 0.22 - yesBtn.offsetWidth / 2);
+        var noLeft  = Math.round(zW * 0.78 - noBtn.offsetWidth / 2);
+
+        yesLeft = clamp(yesLeft, 0, zW - yesBtn.offsetWidth);
+        noLeft  = clamp(noLeft, 0, zW - noBtn.offsetWidth);
+
+        yesBtn.style.left = yesLeft + "px";
+        yesBtn.style.top  = yTop + "px";
+
+        noBtn.style.left = noLeft + "px";
+        noBtn.style.top  = nTop + "px";
+
+        applyYesScale();
+      }
+
+      function applyYesScale(){
+        yesBtn.style.transform = "scale(" + yesScale.toFixed(3) + ")";
+      }
+
+      function setNoLabel(){
+        var idx = clamp(state.noCount, 0, SETTINGS.noLabels.length - 1);
+        noBtn.textContent = SETTINGS.noLabels[idx];
+      }
+
+      function updateLoveMeter(){
+        // 0..100% in ~12 attempts
+        var pct = clamp(Math.round((state.noCount / 12) * 100), 0, 100);
+        loveLevel.textContent = pct + "%";
+        meterFill.style.width = pct + "%";
+      }
+
+      function showReason(){
+        reasonEmoji.textContent = pick(["💬","😈","🫶","🥹","💖"]);
+        reasonText.textContent = pick(SETTINGS.reasons);
+        reasonBox.classList.add("show");
+      }
+
+      function growYes(){
+        yesScale = clamp(yesScale + 0.10, 1, 2.25);
+        applyYesScale();
+      }
+
+      function moveNoAwayFrom(clientX, clientY){
+        var zr = zone.getBoundingClientRect();
+        var px = clientX - zr.left;
+        var py = clientY - zr.top;
+
+        var left = parseFloat(noBtn.style.left) || 0;
+        var top  = parseFloat(noBtn.style.top) || 0;
+        var bw = noBtn.offsetWidth;
+        var bh = noBtn.offsetHeight;
+
+        var bx = left + bw / 2;
+        var by = top  + bh / 2;
+
+        var dx = bx - px;
+        var dy = by - py;
+
+        var mag = Math.sqrt(dx*dx + dy*dy);
+        if(!mag || mag < 0.001){
+          // random direction if pointer is exactly centered
+          dx = (Math.random() - 0.5);
+          dy = (Math.random() - 0.5);
+          mag = Math.sqrt(dx*dx + dy*dy) || 1;
+        }
+        dx /= mag;
+        dy /= mag;
+
+        var step = 170;
+        var newLeft = left + dx * step;
+        var newTop  = top  + dy * step;
+
+        newLeft = clamp(newLeft, 0, zone.clientWidth  - bw);
+        newTop  = clamp(newTop,  0, zone.clientHeight - bh);
+
+        noBtn.style.left = newLeft + "px";
+        noBtn.style.top  = newTop  + "px";
+      }
+
+      function maybeTriggerNo(clientX, clientY){
+        var now = Date.now();
+        if(now - lastNoMoveAt < NO_COOLDOWN_MS) {
+          // still move away a bit for responsiveness, but don’t spam counters/messages/confetti
+          moveNoAwayFrom(clientX, clientY);
+          return;
+        }
+        lastNoMoveAt = now;
+
+        state.noCount += 1;
+        saveStateSoon();
+
+        setNoLabel();
+        updateLoveMeter();
+        showReason();
+        growYes();
+        moveNoAwayFrom(clientX, clientY);
+
+        // tiny confetti only occasionally (keeps performance stable)
+        if(state.noCount % 2 === 0) miniConfetti();
+
+        if(state.noCount === 3) showToast("Nice try 😈");
+        if(state.noCount === 7) showToast("The universe says “YES”");
+        if(state.noCount === 10) showToast("Okay… press Yes already 🥹");
+      }
+
+      function pointerDistToNo(clientX, clientY){
+        var zr = zone.getBoundingClientRect();
+        var px = clientX - zr.left;
+        var py = clientY - zr.top;
+
+        var left = parseFloat(noBtn.style.left) || 0;
+        var top  = parseFloat(noBtn.style.top) || 0;
+
+        var cx = left + noBtn.offsetWidth / 2;
+        var cy = top  + noBtn.offsetHeight / 2;
+
+        var dx = cx - px;
+        var dy = cy - py;
+        return Math.sqrt(dx*dx + dy*dy);
+      }
+
+      zone.addEventListener("pointermove", function(e){
+        var d = pointerDistToNo(e.clientX, e.clientY);
+        if(d < NO_TRIGGER_DIST) maybeTriggerNo(e.clientX, e.clientY);
+      }, { passive:true });
+
+      noBtn.addEventListener("pointerdown", function(e){
+        e.preventDefault();
+        maybeTriggerNo(e.clientX, e.clientY);
+      });
+
+      noBtn.addEventListener("click", function(e){
+        e.preventDefault();
+      });
+
+      yesBtn.addEventListener("click", function(){
+        state.accepted = true;
+        saveStateSoon();
+        showYesScreen();
+      });
+
+      /**********************************************************************
+       *  Yes screen + gifts
+       **********************************************************************/
+      function setGiftBadge(btn, opened){
+        btn.classList.toggle("opened", opened);
+        var badge = btn.querySelector(".badge");
+        badge.textContent = opened ? "Opened ✓" : "Locked";
+      }
+
+      function updateGiftBadges(){
+        setGiftBadge(giftLetter, state.opened.letter);
+        setGiftBadge(giftWheel,  state.opened.wheel);
+        setGiftBadge(giftCoupon, state.opened.coupon);
+      }
+
+      function buildMemories(){
+        polaroids.innerHTML = "";
+        for(var i=0;i<SETTINGS.memories.length;i++){
+          var m = SETTINGS.memories[i];
+          var d = document.createElement("div");
+          d.className = "polaroid";
+          d.innerHTML =
+            '<div class="img">' + m.emoji + '</div>' +
+            '<div class="cap">' + m.title + '</div>' +
+            '<div class="note">' + m.note + '</div>';
+          polaroids.appendChild(d);
+        }
+      }
+
+      function showAskScreen(){
+        screenYes.classList.remove("active");
+        screenAsk.classList.add("active");
+        // ensure layout is correct when returning
+        placeButtons();
+      }
+
+      function showYesScreen(){
+        screenAsk.classList.remove("active");
+        screenYes.classList.add("active");
+        hint.style.display = "none";
+        reasonBox.classList.remove("show");
+
+        burstConfetti();
+        showToast("She said YES 💘");
+      }
+
+      /**********************************************************************
+       *  Modal system (single overlay, ESC to close, click outside to close)
+       **********************************************************************/
+      var currentModalPage = null;
+      var lastFocus = null;
+
+      function setActivePage(name){
+        currentModalPage = name;
+
+        pageLetter.classList.toggle("active", name === "letter");
+        pageWheel.classList.toggle("active",  name === "wheel");
+        pageCoupon.classList.toggle("active", name === "coupon");
+      }
+
+      function openModal(pageName){
+        lastFocus = document.activeElement;
+
+        overlay.classList.add("open");
+        overlay.setAttribute("aria-hidden","false");
+        document.body.style.overflow = "hidden";
+
+        if(pageName === "letter"){
+          modalTitle.textContent = "💌 A love letter for you";
+          modalSub.textContent   = "This one’s permanent. Like my choice of you.";
+          setActivePage("letter");
+          startLetterTyping();
+        }
+
+        if(pageName === "wheel"){
+          modalTitle.textContent = "🎡 Spin the date idea wheel";
+          modalSub.textContent   = "One spin = one plan.";
+          setActivePage("wheel");
+          buildIdeaList();
+          syncWheelResultFromState();
+        }
+
+        if(pageName === "coupon"){
+          modalTitle.textContent = "🎟️ Scratch-off coupon";
+          modalSub.textContent   = "Scratch to reveal your reward (or tap Reveal).";
+          setActivePage("coupon");
+          setupScratchCanvas();
+          applyCouponRevealedState(state.couponRevealed);
+        }
+
+        // focus close for accessibility
+        closeModalBtn.focus();
+      }
+
+      function closeModal(){
+        overlay.classList.remove("open");
+        overlay.setAttribute("aria-hidden","true");
+        document.body.style.overflow = "";
+
+        stopLetterTyping();
+
+        if(lastFocus && lastFocus.focus) lastFocus.focus();
+      }
+
+      closeModalBtn.addEventListener("click", closeModal);
+
+      overlay.addEventListener("click", function(e){
+        if(e.target === overlay) closeModal();
+      });
+
+      document.addEventListener("keydown", function(e){
+        if(e.key === "Escape" && overlay.classList.contains("open")){
+          closeModal();
+        }
+      });
+
+      // Gift clicks
+      function openGift(page){
+        if(page === "letter") state.opened.letter = true;
+        if(page === "wheel")  state.opened.wheel  = true;
+        if(page === "coupon") state.opened.coupon = true;
+        saveStateSoon();
+        updateGiftBadges();
+        openModal(page);
+        miniConfetti();
+      }
+
+      giftLetter.addEventListener("click", function(){ openGift("letter"); });
+      giftWheel.addEventListener("click",  function(){ openGift("wheel");  });
+      giftCoupon.addEventListener("click", function(){ openGift("coupon"); });
+
+      /**********************************************************************
+       *  Letter (typewriter, but safe + cancellable)
+       **********************************************************************/
+      var letterRAF = null;
+
+      function stopLetterTyping(){
+        if(letterRAF) cancelAnimationFrame(letterRAF);
+        letterRAF = null;
+      }
+
+      function startLetterTyping(){
+        stopLetterTyping();
+
+        var full = buildLetterText();
+        if(prefersReducedMotion()){
+          letterBox.textContent = full;
+          return;
+        }
+
+        letterBox.textContent = "";
+        var i = 0;
+
+        function tick(){
+          // 3 chars per frame (fast + smooth)
+          i = Math.min(full.length, i + 3);
+          letterBox.textContent = full.slice(0, i);
+          if(i < full.length){
+            letterRAF = requestAnimationFrame(tick);
+          }else{
+            letterRAF = null;
+          }
+        }
+        tick();
+      }
+
+      copyLetterBtn.addEventListener("click", function(){
+        var text = buildLetterText();
+        // clipboard may fail on file:// or non-https; fallback to prompt
+        if(navigator.clipboard && navigator.clipboard.writeText){
+          navigator.clipboard.writeText(text).then(function(){
+            showToast("Copied 💖");
+          }).catch(function(){
+            window.prompt("Copy the letter:", text);
+          });
+        }else{
+          window.prompt("Copy the letter:", text);
+        }
+      });
+
+      moreConfettiBtn.addEventListener("click", function(){
+        burstConfetti();
+        showToast("More confetti ✨");
+      });
+
+      /**********************************************************************
+       *  Wheel (robust spin: uses timeout, not transitionend)
+       **********************************************************************/
+      var wheelAngle = 0;
+      var wheelSpinning = false;
+      var spinTimer = null;
+
+      function buildIdeaList(){
+        ideaList.innerHTML = "";
+        for(var i=0;i<SETTINGS.dateIdeas.length;i++){
+          var li = document.createElement("li");
+          li.innerHTML = '<span>' + SETTINGS.dateIdeas[i] + '</span><span class="tag">#' + (i+1) + '</span>';
+          ideaList.appendChild(li);
+        }
+        highlightIdea(state.chosenIdea);
+      }
+
+      function highlightIdea(idea){
+        var items = ideaList.children;
+        for(var i=0;i<items.length;i++){
+          items[i].classList.remove("selected");
+          if(SETTINGS.dateIdeas[i] === idea) items[i].classList.add("selected");
+        }
+      }
+
+      function setWheelResult(idea){
+        wheelResult.innerHTML =
+          "✅ The wheel chose: <b>" + idea + "</b><br>" +
+          '<span style="color:rgba(0,0,0,.62); font-size:13px;">You + me. No excuses. Just vibes.</span>';
+        copyIdeaBtn.disabled = false;
+        icsBtn.disabled = false;
+        highlightIdea(idea);
+      }
+
+      function syncWheelResultFromState(){
+        if(state.chosenIdea){
+          setWheelResult(state.chosenIdea);
+        }else{
+          wheelResult.innerHTML = "<b>Tip:</b> Hit <b>Spin</b> and I’ll pick something adorable for us 💞";
+          copyIdeaBtn.disabled = true;
+          icsBtn.disabled = true;
+        }
+      }
+
+      function spinWheel(){
+        if(wheelSpinning) return;
+        wheelSpinning = true;
+        copyIdeaBtn.disabled = true;
+        icsBtn.disabled = true;
+
+        var n = SETTINGS.dateIdeas.length;
+        var idx = Math.floor(Math.random() * n);
+        var idea = SETTINGS.dateIdeas[idx];
+
+        // rotate a bunch + land roughly on a segment (visual only)
+        var extraSpins = 5 + Math.floor(Math.random() * 2);
+        wheelAngle += extraSpins * 360 + (Math.random() * 360);
+
+        wheel.style.transform = "rotate(" + wheelAngle + "deg)";
+
+        // duration matches CSS (or near 0 for reduced motion)
+        var duration = prefersReducedMotion() ? 1 : 4100;
+        if(spinTimer) clearTimeout(spinTimer);
+        spinTimer = setTimeout(function(){
+          wheelSpinning = false;
+          state.chosenIdea = idea;
+          saveStateSoon();
+          setWheelResult(idea);
+          miniConfetti();
+        }, duration);
+      }
+
+      spinBtn.addEventListener("click", spinWheel);
+
+      copyIdeaBtn.addEventListener("click", function(){
+        var idea = state.chosenIdea || "";
+        if(!idea) return;
+
+        if(navigator.clipboard && navigator.clipboard.writeText){
+          navigator.clipboard.writeText(idea).then(function(){
+            showToast("Idea copied 💞");
+          }).catch(function(){
+            window.prompt("Copy the idea:", idea);
+          });
+        }else{
+          window.prompt("Copy the idea:", idea);
+        }
+      });
+
+      function pad2(n){ return (n < 10 ? "0" : "") + n; }
+      function formatICSDateUTC(d){
+        return (
+          d.getUTCFullYear() +
+          pad2(d.getUTCMonth()+1) +
+          pad2(d.getUTCDate()) + "T" +
+          pad2(d.getUTCHours()) +
+          pad2(d.getUTCMinutes()) +
+          pad2(d.getUTCSeconds()) + "Z"
+        );
+      }
+
+      function downloadICS(summary, description, location, startLocal, endLocal){
+        var uid = Date.now() + "-" + Math.random().toString(16).slice(2) + "@valentine";
+        var dtstamp = formatICSDateUTC(new Date());
+
+        var ics =
+"BEGIN:VCALENDAR\n" +
+"VERSION:2.0\n" +
+"PRODID:-//Valentine//EN\n" +
+"CALSCALE:GREGORIAN\n" +
+"METHOD:PUBLISH\n" +
+"BEGIN:VEVENT\n" +
+"UID:" + uid + "\n" +
+"DTSTAMP:" + dtstamp + "\n" +
+"DTSTART:" + formatICSDateUTC(startLocal) + "\n" +
+"DTEND:" + formatICSDateUTC(endLocal) + "\n" +
+"SUMMARY:" + summary.replace(/\n/g," ") + "\n" +
+"DESCRIPTION:" + description.replace(/\n/g,"\\n") + "\n" +
+"LOCATION:" + location.replace(/\n/g," ") + "\n" +
+"END:VEVENT\n" +
+"END:VCALENDAR\n";
+
+        var blob = new Blob([ics], { type: "text/calendar;charset=utf-8" });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement("a");
+        a.href = url;
+        a.download = "valentine-date.ics";
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(function(){ URL.revokeObjectURL(url); }, 800);
+      }
+
+      icsBtn.addEventListener("click", function(){
+        var idea = state.chosenIdea || "Our Valentine Date 💖";
+        var i = SETTINGS.ics;
+        var start = new Date(i.year, i.month - 1, i.day, i.hour, i.minute, 0);
+        var end = new Date(start.getTime() + i.durationHours * 60 * 60 * 1000);
+
+        var summary = "Valentine Date: " + idea;
+        var desc = "Chosen by the wheel 🎡\n\nBring hugs. Bring kisses. Bring you.\n\nLove,\n" + SETTINGS.yourName;
+
+        downloadICS(summary, desc, i.location, start, end);
+        showToast("Calendar invite downloaded 📅");
+      });
+
+      /**********************************************************************
+       *  Coupon scratch (robust + reveal fallback)
+       **********************************************************************/
+      var scratchCtx = scratchCanvas.getContext("2d");
+      var scratching = false;
+
+      function setupScratchCanvas(){
+        // Always size to the visible element size (with DPR), then redraw cover.
+        var rect = scratchCanvas.getBoundingClientRect();
+        var dpr = Math.max(1, window.devicePixelRatio || 1);
+
+        scratchCanvas.width  = Math.floor(rect.width * dpr);
+        scratchCanvas.height = Math.floor(rect.height * dpr);
+
+        // map drawing to CSS pixels
+        scratchCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        drawScratchCover();
+      }
+
+      function drawScratchCover(){
+        scratchCtx.globalCompositeOperation = "source-over";
+        scratchCtx.clearRect(0, 0, scratchCanvas.width, scratchCanvas.height);
+
+        if(state.couponRevealed){
+          // already revealed: leave it clear
+          return;
+        }
+
+        var rect = scratchCanvas.getBoundingClientRect();
+        var w = rect.width, h = rect.height;
+
+        var g = scratchCtx.createLinearGradient(0,0,w,h);
+        g.addColorStop(0, "rgba(120,120,140,.90)");
+        g.addColorStop(.5,"rgba(190,190,205,.88)");
+        g.addColorStop(1, "rgba(110,110,130,.90)");
+        scratchCtx.fillStyle = g;
+        scratchCtx.fillRect(0,0,w,h);
+
+        scratchCtx.globalAlpha = 0.22;
+        scratchCtx.fillStyle = "rgba(255,255,255,.95)";
+        scratchCtx.font = "900 16px system-ui";
+        scratchCtx.textAlign = "center";
+        scratchCtx.textBaseline = "middle";
+        scratchCtx.fillText("SCRATCH HERE ✨", w/2, h/2);
+        scratchCtx.globalAlpha = 1;
+      }
+
+      function scratchAt(clientX, clientY){
+        if(state.couponRevealed) return;
+
+        var rect = scratchCanvas.getBoundingClientRect();
+        var x = clientX - rect.left;
+        var y = clientY - rect.top;
+
+        scratchCtx.globalCompositeOperation = "destination-out";
+        scratchCtx.beginPath();
+        scratchCtx.arc(x, y, 18, 0, Math.PI * 2);
+        scratchCtx.fill();
+        scratchCtx.globalCompositeOperation = "source-over";
+      }
+
+      function estimateRevealed(){
+        // Sample a grid to estimate how much is cleared.
+        var w = scratchCanvas.width;
+        var h = scratchCanvas.height;
+        if(w === 0 || h === 0) return 0;
+
+        var step = Math.max(10, Math.floor(Math.min(w,h) / 70));
+        var img = scratchCtx.getImageData(0,0,w,h).data;
+
+        var total = 0, clear = 0;
+        for(var y=0;y<h;y+=step){
+          for(var x=0;x<w;x+=step){
+            var idx = (y*w + x)*4 + 3; // alpha
+            total++;
+            if(img[idx] < 30) clear++;
+          }
+        }
+        return clear / total;
+      }
+
+      function applyCouponRevealedState(revealed){
+        state.couponRevealed = !!revealed;
+        claimBtn.disabled = !state.couponRevealed;
+        saveStateSoon();
+        if(state.couponRevealed){
+          // clear cover completely
+          scratchCtx.globalCompositeOperation = "source-over";
+          scratchCtx.clearRect(0,0,scratchCanvas.width, scratchCanvas.height);
+        }else{
+          drawScratchCover();
+        }
+      }
+
+      scratchCanvas.addEventListener("pointerdown", function(e){
+        if(state.couponRevealed) return;
+        scratching = true;
+        scratchCanvas.setPointerCapture(e.pointerId);
+        scratchAt(e.clientX, e.clientY);
+      });
+
+      scratchCanvas.addEventListener("pointermove", function(e){
+        if(!scratching) return;
+        scratchAt(e.clientX, e.clientY);
+      });
+
+      function endScratch(){
+        if(!scratching) return;
+        scratching = false;
+
+        if(state.couponRevealed) return;
+
+        var pct = estimateRevealed();
+        if(pct > 0.55){
+          applyCouponRevealedState(true);
+          burstConfetti();
+          showToast("Reward revealed 😭💖");
+        }
+      }
+
+      scratchCanvas.addEventListener("pointerup", endScratch);
+      scratchCanvas.addEventListener("pointercancel", endScratch);
+      scratchCanvas.addEventListener("lostpointercapture", endScratch);
+
+      revealBtn.addEventListener("click", function(){
+        applyCouponRevealedState(true);
+        burstConfetti();
+        showToast("Revealed 💖");
+      });
+
+      resetScratchBtn.addEventListener("click", function(){
+        applyCouponRevealedState(false);
+        showToast("Reset ✅");
+      });
+
+      claimBtn.addEventListener("click", function(){
+        if(!state.couponRevealed) return;
+        burstConfetti();
+        showToast("Claimed 💋 (redeem immediately)");
+      });
+
+      /**********************************************************************
+       *  Share + Reset (Reset is handy while debugging)
+       **********************************************************************/
+      shareBtn.addEventListener("click", function(){
+        var url = window.location.href;
+        var text = "💘 " + SETTINGS.herName + ", will you be my Valentine?";
+        if(navigator.share){
+          navigator.share({ title: "Valentine 💖", text: text, url: url }).then(function(){
+            showToast("Shared 💌");
+          }).catch(function(){ /* user canceled */ });
+        }else{
+          // fallback: copy link
+          if(navigator.clipboard && navigator.clipboard.writeText){
+            navigator.clipboard.writeText(url).then(function(){
+              showToast("Link copied ✨");
+            }).catch(function(){
+              window.prompt("Copy this link:", url);
+            });
+          }else{
+            window.prompt("Copy this link:", url);
+          }
+        }
+      });
+
+      resetBtn.addEventListener("click", function(){
+        // For you while testing. Remove this button later if you want.
+        state.accepted = false;
+        state.noCount = 0;
+        state.opened = { letter:false, wheel:false, coupon:false };
+        state.chosenIdea = "";
+        state.couponRevealed = false;
+        saveStateSoon();
+
+        yesScale = 1;
+        applyYesScale();
+        setNoLabel();
+        updateLoveMeter();
+        reasonBox.classList.remove("show");
+        hint.style.display = "";
+
+        closeModal();
+        showAskScreen();
+        placeButtons();
+
+        showToast("Reset done");
+      });
+
+      /**********************************************************************
+       *  Init
+       **********************************************************************/
+      function init(){
+        buildMemories();
+        updateGiftBadges();
+        setNoLabel();
+        updateLoveMeter();
+
+        // Ensure buttons are placed after layout
+        placeButtons();
+
+        if(state.accepted){
+          showYesScreen();
+        }else{
+          showAskScreen();
+        }
+      }
+
+      init();
+
+    })();
   </script>
 </body>
 </html>
